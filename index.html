@@ -3,9 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TARGETING COMPUTER - HIGHFLEET</title>
+<title>HF-INTERCEPT COMPUTER</title>
 <style>
-  /* ========== KOLORY HIGHFLEET ========== */
   :root {
     --bg: #000000;
     --accent: #ffaa00;
@@ -23,7 +22,6 @@
     --tooltip-bg: #1a1a1a;
   }
 
-  /* ========== PODSTAWY ========== */
   body {
     background: var(--bg);
     color: var(--accent);
@@ -36,7 +34,6 @@
     overflow: hidden;
   }
 
-  /* ========== NAGŁÓWEK ========== */
   .header {
     text-align: center;
     padding: 6px 0;
@@ -52,7 +49,6 @@
     font-weight: normal;
   }
 
-  /* ========== SIATKA WEJŚCIA ========== */
   .input-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -60,7 +56,6 @@
     margin-bottom: 10px;
   }
 
-  /* ========== POLE ZE STRZAŁKAMI ========== */
   .input-container {
     position: relative;
   }
@@ -91,7 +86,6 @@
     background: #1a1a1a;
   }
 
-  /* ========== STRZAŁKI ========== */
   .arrow-controls {
     position: absolute;
     right: 4px;
@@ -120,15 +114,6 @@
     -webkit-user-select: none;
   }
 
-  .arrow-btn:hover {
-    color: var(--accent);
-  }
-
-  .arrow-btn:active {
-    color: #ffffff;
-  }
-
-  /* ========== SELEKTOR RAKIET (Z TOOLTIPEM) ========== */
   .rocket-select-container {
     position: relative;
     margin: 8px 0;
@@ -143,11 +128,9 @@
     border: 1px solid var(--border);
     border-radius: 3px;
     font-family: 'Courier New', monospace;
-    text-transform: uppercase;
     cursor: pointer;
   }
 
-  /* ========== TOOLTIP DLA RAKIET ========== */
   .missile-tooltip {
     position: fixed;
     background: var(--tooltip-bg);
@@ -191,7 +174,6 @@
     flex: 1;
   }
 
-  /* ========== PANEL CELOWANIA ========== */
   .targeting-panel {
     background: var(--panel);
     border: 1px solid var(--border);
@@ -207,6 +189,7 @@
     justify-content: space-between;
     align-items: center;
     min-height: 16px;
+    position: relative;
   }
 
   .target-label {
@@ -214,6 +197,7 @@
     text-transform: uppercase;
     font-size: 10px;
     letter-spacing: 0.5px;
+    cursor: help;
   }
 
   .target-value {
@@ -223,7 +207,26 @@
     font-weight: bold;
   }
 
-  /* ========== STATUS ========== */
+  .result-tooltip {
+  position: fixed;
+  background: var(--tooltip-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px;
+  font-size: 10px;
+  color: var(--text-light);
+  line-height: 1.4;
+  z-index: 10000;
+  display: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  max-width: 250px;
+  pointer-events: none;
+}
+
+  .result-tooltip.show {
+    display: block;
+  }
+
   .status-line {
     color: var(--text-dim);
     font-size: 9px;
@@ -245,24 +248,15 @@
     font-size: 10px;
   }
 
-  /* ========== KLAWIATURA I PRZYCISK ========== */
-  .bottom-section {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 8px;
-    align-items: end;
-  }
-
-  /* ========== KLAWIATURA (3x4 + CLEAR W 2 KOLUMNACH) ========== */
   .keyboard {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 5px;
-    grid-template-rows: repeat(4, 36px);
-    align-items: end;
+    margin-top: 10px;
   }
 
   .key {
+    height: 36px;
     background: var(--field);
     color: var(--accent);
     border: 1px solid var(--border);
@@ -274,7 +268,6 @@
     cursor: pointer;
     font-family: 'Courier New', monospace;
     user-select: none;
-    height: 100%;
   }
 
   .key:active {
@@ -283,63 +276,25 @@
   }
 
   .key-clear {
-  /* USUŃ: grid-column: span 2; */
-  font-size: 11px;
-  text-transform: uppercase;
-}
-
-.key-compute {
-  font-size: 9px; /* Zmniejszona czcionka */
-  text-transform: uppercase;
-  background: var(--field);
-  color: var(--accent);
-  line-height: 1.1; /* Lepsze odstępy dla małej czcionki */
-  text-align: center;
-  padding: 2px;
-}
-
-.key-compute:active {
-  background: var(--accent);
-  color: #000;
-}
-
-  /* ========== PRZYCISK OGNIA (POD CYFRĄ 9, WYSOKOŚĆ JAK CLEAR) ========== */
-  .fire-btn-container {
-    display: flex;
-    flex-direction: column;
-    height: calc(36px + 36px + 5px); /* Wysokość jak CLEAR (36px) + wyrównanie */
+    font-size: 11px;
+    text-transform: uppercase;
   }
 
-  .fire-btn {
-    width: 76px; /* Taka sama szerokość jak klawisze (1fr = ~76px) */
-    height: 36px; /* Taka sama wysokość jak CLEAR */
-    background: linear-gradient(to bottom, #000000, #111111);
-    color: var(--accent);
-    border: 1px solid var(--border);
-    border-radius: 3px;
+  .key-compute {
     font-size: 9px;
     text-transform: uppercase;
-    font-family: 'Courier New', monospace;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 5px;
-    transition: all 0.2s;
-    box-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
+    background: var(--field);
+    color: var(--accent);
+    line-height: 1.1;
     text-align: center;
-    line-height: 1.2;
-    white-space: normal;
+    padding: 2px;
   }
 
-  .fire-btn:active {
+  .key-compute:active {
     background: var(--accent);
-    color: #000000;
-    box-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
+    color: #000;
   }
 
-  /* ========== STOPKA ========== */
   .footer {
     font-size: 8px;
     color: var(--text-dim);
@@ -352,12 +307,10 @@
 </head>
 <body>
 
-<!-- ========== NAGŁÓWEK ========== -->
 <div class="header">
-  <h1>TARGETING COMPUTER</h1>
+  <h1>HF-INTERCEPT COMPUTER</h1>
 </div>
 
-<!-- ========== DANE WEJŚCIOWE ========== -->
 <div class="input-grid">
   <div class="input-container">
     <input id="sx" class="input-field" type="text" maxlength="6" placeholder="OUR X" readonly>
@@ -403,30 +356,57 @@
   </div>
 </div>
 
-<!-- ========== WYBÓR RAKIETY (Z TOOLTIPEM) ========== -->
 <div class="rocket-select-container">
-  <select id="rakieta" class="rocket-select" onchange="checkMissileCompatibility(); updateTooltip()" 
-          onmouseover="showMissileTooltip(event)" onmouseout="hideMissileTooltip()">
-    <optgroup label="CRUISE MISSILES">
-      <option value="Kh15">KH-15 (1600km, 900km/h)</option>
-      <option value="Kh22">KH-22 (2500km, 1200km/h)</option>
+  <select id="rakieta" class="rocket-select" onchange="checkMissileCompatibility()">
+    <optgroup label="Kh-15 (Cruise Missile)">
+      <option value="Kh15">Kh-15 (1600km, 900km/h) - Cele naziemne/morskie</option>
+      <option value="Kh15N">Kh-15N (1600km, 900km/h) - Broń strategiczna</option>
+      <option value="Kh15P">Kh-15P (1600km, 900km/h) - Przeciwradarowa</option>
     </optgroup>
-    <optgroup label="TACTICAL">
-      <option value="A100">A-100 (400km, 4000km/h)</option>
-      <option value="R9">R-9 SPRINT (200km, 5000km/h)</option>
+
+    <optgroup label="Kh-22 (Cruise Missile)">
+      <option value="Kh22">Kh-22 (2500km, 1200km/h) - Cele strategiczne/flota</option>
+      <option value="Kh22N">Kh-22N (2500km, 1200km/h) - Broń strategiczna</option>
     </optgroup>
-    <optgroup label="AIR-TO-AIR">
-      <option value="K13">K-13 AAM (30km, 2000km/h)</option>
+
+    <optgroup label="A-100 (Tactical Missile)">
+      <option value="A100">A-100 (400km, 4000km/h) - Obrona przeciwlotnicza</option>
+      <option value="A100N">A-100N (400km, 4000km/h) - Szybkie uderzenia nuklearne</option>
+    </optgroup>
+
+    <optgroup label="R-9 Sprint (AA Defence)">
+      <option value="R9">R-9 Sprint (200km, 5000km/h) - Obrona punktowa</option>
+    </optgroup>
+
+    <optgroup label="R-3 (Ballistic Missile)">
+      <option value="R3">R-3 (2000km, 8280km/h) - Ataki balistyczne</option>
+      <option value="R3N">R-3N (2000km, 8280km/h) - Uderzenia strategiczne</option>
+    </optgroup>
+
+    <optgroup label="R-5 Zenith (Air-to-Air)">
+      <option value="R5">R-5 Zenith (30km, 2000km/h) - Walka powietrzna WVR</option>
+    </optgroup>
+
+    <optgroup label="K-13 AAM (Air-to-Air)">
+      <option value="K13">K-13 (30km, 2000km/h) - Walka powietrzna</option>
+    </optgroup>
+
+    <optgroup label="S-13 NURS (Unguided)">
+      <option value="S13">S-13 (20km, 1500km/h) - Ataki naziemne</option>
+    </optgroup>
+
+    <optgroup label="FAB Bombs">
+      <option value="FAB100">FAB-100 (5km, sw. spadek) - Naloty bombowe</option>
+      <option value="FAB250">FAB-250 (5km, sw. spadek) - Naloty bombowe</option>
     </optgroup>
   </select>
 </div>
 
-<!-- TOOLTIP (oddzielny element) -->
 <div class="missile-tooltip" id="missileTooltip">
   <div class="tooltip-title" id="tooltipName">KH-15 CRUISE MISSILE</div>
   <div class="tooltip-item">
     <span class="tooltip-label">Naprowadzanie:</span>
-    <span class="tooltip-value" id="tooltipGuidance">Aktywny radar</span>
+    <span class="tooltip-value" id="tooltipGuidance">Pośrednie naprowadzanie</span>
   </div>
   <div class="tooltip-item">
     <span class="tooltip-label">Zapalnik:</span>
@@ -446,33 +426,34 @@
   </div>
 </div>
 
-<!-- ========== WYNIKI CELOWANIA ========== -->
 <div class="targeting-panel" id="wynik">
-  <div class="target-line">
+  <div class="target-line" onmouseover="showResultTooltip('markerTooltip', event)" onmouseout="hideResultTooltip('markerTooltip')">
     <span class="target-label">MARKER COORDS:</span>
     <span class="target-value" id="marker">---, --- km</span>
+    <div class="result-tooltip" id="markerTooltip">Współrzędne punktu, w który należy wycelować rakietę.<br>Rakieta poleci w to miejsce i po uzbrojeniu zacznie szukać celu.</div>
   </div>
-  <div class="target-line">
+  <div class="target-line" onmouseover="showResultTooltip('distanceTooltip', event)" onmouseout="hideResultTooltip('distanceTooltip')">
     <span class="target-label">DISTANCE:</span>
     <span class="target-value" id="distance">--- km</span>
+    <div class="result-tooltip" id="distanceTooltip">Odległość od twojej pozycji do punktu celowania.<br>Musi być mniejsza niż maksymalny zasięg rakiety.</div>
   </div>
-  <div class="target-line">
+  <div class="target-line" onmouseover="showResultTooltip('bearingTooltip', event)" onmouseout="hideResultTooltip('bearingTooltip')">
     <span class="target-label">BEARING:</span>
     <span class="target-value" id="bearing">---°</span>
+    <div class="result-tooltip" id="bearingTooltip">Kierunek w stopniach (0-360°), w którym należy wystrzelić rakietę.<br>0° = północ, 90° = wschód, 180° = południe, 270° = zachód.</div>
   </div>
-  <div class="target-line">
+  <div class="target-line" onmouseover="showResultTooltip('optimalTooltip', event)" onmouseout="hideResultTooltip('optimalTooltip')">
     <span class="target-label">OPTIMAL RANGE:</span>
     <span class="target-value" id="optimal">--- km</span>
+    <div class="result-tooltip" id="optimalTooltip">Optymalny zasięg rakiety uwzględniający odległość uzbrajania.<br>Dla rakiet radarowych: odległość uzbrajania + 50 km zapasu.</div>
   </div>
   
-  <!-- STATUS -->
   <div class="status-line" id="statusContainer">
     <span class="status-icon" id="statusIcon">⚠️</span>
     <span id="statusText">ENTER TARGET DATA</span>
   </div>
 </div>
 
-<!-- ========== DOLNA SEKCJA: KLAWIATURA + PRZYCISK ========== -->
 <div class="keyboard">
   <div class="key" onclick="press('1')">1</div>
   <div class="key" onclick="press('2')">2</div>
@@ -484,95 +465,327 @@
   <div class="key" onclick="press('8')">8</div>
   <div class="key" onclick="press('9')">9</div>
   
-  <!-- DOLNY RZĄD -->
   <div class="key" onclick="press('0')">0</div>
   <div class="key key-clear" onclick="clearField()">CLEAR</div>
   <div class="key key-compute" onclick="calculateTarget()">COMPUTE FIRING SOLUTION</div>
 </div>
-</div>
 
-<!-- ========== STOPKA ========== -->
-<div class="footer">
-  HIGHFLEET TARGETING SYSTEM v2.0
-</div>
+<div class="footer">HF-INTERCEPT COMPUTER v2.0</div>
 
 <script>
 // ========== KONFIGURACJA RAKIET ==========
 const missiles = {
   "Kh15": { 
-    speed: 900,
-    range: 1600,
-    arming: 100,
-    guidance: "INDIRECT GUIDANCE",
-    fuse: "PROXIMITY FUSE",
-    warhead: "HIGH-EXPLOSIVE WARHEAD / NUCLEAR WARHEAD",
-    armingText: "100 km od startu",
-    context: "Rakieta przeciwradiacyjna (ARM), namierza źródła radarowe. Uzbraja się po 100 km lotu.",
-    name: "KH-15 CRUISE MISSILE"
+    speed: 900, 
+    range: 1600, 
+    arming: 100, 
+    guidance: "Pośrednie naprowadzanie", 
+    guidanceEN: "WAYPOINT GUIDANCE",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Burząca", 
+    warheadEN: "HIGH-EXPLOSIVE",
+    armingText: "100 km od startu", 
+    context: "Ataki strategiczne na cele naziemne i okręty", 
+    name: "KH-15 CRUISE MISSILE" 
+  },
+  "Kh15N": { 
+    speed: 900, 
+    range: 1600, 
+    arming: 100, 
+    guidance: "Pośrednie naprowadzanie", 
+    guidanceEN: "WAYPOINT GUIDANCE",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Jądrowa", 
+    warheadEN: "NUCLEAR",
+    armingText: "100 km od startu", 
+    context: "Broń strategiczna, niszczenie miast i flot", 
+    name: "KH-15N NUCLEAR CRUISE MISSILE" 
+  },
+  "Kh15P": { 
+    speed: 900, 
+    range: 1600, 
+    arming: 100, 
+    guidance: "Pośrednie naprowadzanie", 
+    guidanceEN: "WAYPOINT GUIDANCE",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Przeciwradiacyjna", 
+    warheadEN: "ANTI-RADIATION",
+    armingText: "100 km od startu", 
+    context: "Neutralizacja radarów i systemów obrony", 
+    name: "KH-15P ANTI-RADIATION MISSILE" 
   },
   "Kh22": { 
-    speed: 1200,
-    range: 2500,
-    arming: 100,
-    guidance: "INDIRECT GUIDANCE",
-    fuse: "PROXIMITY FUSE",
-    warhead: "HIGH-EXPLOSIVE WARHEAD / NUCLEAR WARHEAD",
-    armingText: "100 km od startu",
-    context: "Ciężka rakieta manewrująca. Skuteczna przeciwko dużym celom naziemnym i morskim.",
-    name: "KH-22 CRUISE MISSILE"
+    speed: 1200, 
+    range: 2500, 
+    arming: 100, 
+    guidance: "Pośrednie naprowadzanie", 
+    guidanceEN: "WAYPOINT GUIDANCE",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Burząca", 
+    warheadEN: "HIGH-EXPLOSIVE",
+    armingText: "100 km od startu", 
+    context: "Ataki dalekiego zasięgu na flotę i cele strategiczne", 
+    name: "KH-22 CRUISE MISSILE" 
+  },
+  "Kh22N": { 
+    speed: 1200, 
+    range: 2500, 
+    arming: 100, 
+    guidance: "Pośrednie naprowadzanie", 
+    guidanceEN: "WAYPOINT GUIDANCE",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Jądrowa", 
+    warheadEN: "NUCLEAR",
+    armingText: "100 km od startu", 
+    context: "Broń strategiczna, niszczenie dużych obszarów", 
+    name: "KH-22N NUCLEAR CRUISE MISSILE" 
   },
   "A100": { 
-    speed: 4000,
-    range: 400,
-    arming: 0,
-    guidance: "DIRECT GUIDANCE",
-    fuse: "PROXIMITY FUSE",
-    warhead: "FRAGMENTATION WARHEAD",
-    armingText: "Natychmiastowa gotowość",
-    context: "Rakieta taktyczna przeciwlotnicza. Bardzo szybka, skuteczna przeciw samolotom i rakietom.",
-    name: "A-100 TACTICAL MISSILE"
+    speed: 4000, 
+    range: 400, 
+    arming: 0, 
+    guidance: "Bezpośrednie naprowadzanie", 
+    guidanceEN: "DIRECT GUIDANCE",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Odłamkowa", 
+    warheadEN: "FRAGMENTATION",
+    armingText: "Natychmiastowa gotowość", 
+    context: "Obrona przeciwlotnicza, zwalczanie samolotów i rakiet", 
+    name: "A-100 TACTICAL MISSILE" 
+  },
+  "A100N": { 
+    speed: 4000, 
+    range: 400, 
+    arming: 0, 
+    guidance: "Bezpośrednie naprowadzanie", 
+    guidanceEN: "DIRECT GUIDANCE",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Jądrowa", 
+    warheadEN: "NUCLEAR",
+    armingText: "Natychmiastowa gotowość", 
+    context: "Szybkie uderzenia nuklearne", 
+    name: "A-100N NUCLEAR MISSILE" 
   },
   "R9": { 
-    speed: 5000,
-    range: 200,
-    arming: 0,
-    guidance: "DIRECT GUIDANCE",
-    fuse: "PROXIMITY FUSE",
-    warhead: "FRAGMENTATION WARHEAD",
-    armingText: "Natychmiastowa gotowość",
-    context: "System obrony punktowej. Automatyczne naprowadzanie na cele powietrzne.",
-    name: "R-9 SPRINT AA MISSILE"
+    speed: 5000, 
+    range: 200, 
+    arming: 0, 
+    guidance: "Bezpośrednie naprowadzanie", 
+    guidanceEN: "DIRECT GUIDANCE",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Odłamkowa", 
+    warheadEN: "FRAGMENTATION",
+    armingText: "Natychmiastowa gotowość", 
+    context: "Obrona baz i flot przed pociskami i samolotami", 
+    name: "R-9 SPRINT POINT DEFENSE" 
+  },
+  "R3": { 
+    speed: 8280, 
+    range: 2000, 
+    arming: 0, 
+    guidance: "Naprowadzanie inercyjne", 
+    guidanceEN: "INERTIAL GUIDANCE",
+    fuse: "Zapalnik uderzeniowy", 
+    fuseEN: "IMPACT FUSE",
+    warhead: "Burząca", 
+    warheadEN: "HIGH-EXPLOSIVE",
+    armingText: "Brak korekt w locie", 
+    context: "Ataki balistyczne na cele stacjonarne", 
+    name: "R-3 BALLISTIC MISSILE" 
+  },
+  "R3N": { 
+    speed: 8280, 
+    range: 2000, 
+    arming: 0, 
+    guidance: "Naprowadzanie inercyjne", 
+    guidanceEN: "INERTIAL GUIDANCE",
+    fuse: "Zapalnik uderzeniowy", 
+    fuseEN: "IMPACT FUSE",
+    warhead: "Jądrowa", 
+    warheadEN: "NUCLEAR",
+    armingText: "Brak korekt w locie", 
+    context: "Strategiczne uderzenia nuklearne", 
+    name: "R-3N NUCLEAR BALLISTIC MISSILE" 
+  },
+  "R5": { 
+    speed: 2000, 
+    range: 30, 
+    arming: 0, 
+    guidance: "Naprowadzanie na podczerwień", 
+    guidanceEN: "HEAT-SEEKING",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Odłamkowa", 
+    warheadEN: "FRAGMENTATION",
+    armingText: "Natychmiastowa gotowość", 
+    context: "Walka powietrzna w zasięgu wzroku", 
+    name: "R-5 ZENITH AIR-TO-AIR" 
   },
   "K13": { 
-    speed: 2000,
-    range: 30,
-    arming: 0,
-    guidance: "HEAT‑SEEKING",
-    fuse: "PROXIMITY FUSE",
-    warhead: "FRAGMENTATION WARHEAD",
-    armingText: "Natychmiastowa gotowość",
-    context: "Powietrze-powietrze. Naprowadzanie na podczerwień (podatna na flary).",
-    name: "K-13 AIR-TO-AIR MISSILE"
+    speed: 2000, 
+    range: 30, 
+    arming: 0, 
+    guidance: "Naprowadzanie na podczerwień", 
+    guidanceEN: "HEAT-SEEKING",
+    fuse: "Zapalnik zbliżeniowy", 
+    fuseEN: "PROXIMITY FUSE",
+    warhead: "Odłamkowa", 
+    warheadEN: "FRAGMENTATION",
+    armingText: "Natychmiastowa gotowość", 
+    context: "Walka powietrzna, zwalczanie celów powietrznych", 
+    name: "K-13 AIR-TO-AIR MISSILE" 
+  },
+  "S13": { 
+    speed: 1500, 
+    range: 20, 
+    arming: 0, 
+    guidance: "Brak naprowadzania", 
+    guidanceEN: "UNGUIDED",
+    fuse: "Zapalnik uderzeniowy", 
+    fuseEN: "IMPACT FUSE",
+    warhead: "Burząca", 
+    warheadEN: "HIGH-EXPLOSIVE",
+    armingText: "Prosta balistyka", 
+    context: "Ataki naziemne, ostrzał obszarowy", 
+    name: "S-13 UNGUIDED ROCKET" 
+  },
+  "FAB100": { 
+    speed: 0, 
+    range: 5, 
+    arming: 0, 
+    guidance: "Brak naprowadzania", 
+    guidanceEN: "UNGUIDED",
+    fuse: "Zapalnik uderzeniowy", 
+    fuseEN: "IMPACT FUSE",
+    warhead: "Burząca", 
+    warheadEN: "HIGH-EXPLOSIVE",
+    armingText: "Swobodny spadek", 
+    context: "Naloty bombowe na cele naziemne", 
+    name: "FAB-100 BOMB" 
+  },
+  "FAB250": { 
+    speed: 0, 
+    range: 5, 
+    arming: 0, 
+    guidance: "Brak naprowadzania", 
+    guidanceEN: "UNGUIDED",
+    fuse: "Zapalnik uderzeniowy", 
+    fuseEN: "IMPACT FUSE",
+    warhead: "Burząca", 
+    warheadEN: "HIGH-EXPLOSIVE",
+    armingText: "Swobodny spadek", 
+    context: "Naloty bombowe na cele naziemne", 
+    name: "FAB-250 BOMB" 
   }
 };
 
-// ========== ZMIENNE DLA STRZAŁEK (auto-przewijanie) ==========
+// ========== OBSŁUGA MENU RAKIET ==========
+const rocketSelect = document.getElementById("rakieta");
+let missileTooltipTimer = null;
+let lastMissileKey = null;
+
+rocketSelect.addEventListener("mousemove", function(event) {
+  if (rocketSelect.size <= 1) return;
+  
+  const options = rocketSelect.options;
+  const rect = rocketSelect.getBoundingClientRect();
+  
+  const optionIndex = Math.floor((event.clientY - rect.top) / 20);
+  const option = options[optionIndex];
+  
+  if (option && option.value) {
+    const missileKey = option.value;
+    
+    if (missileKey !== lastMissileKey) {
+      lastMissileKey = missileKey;
+      
+      if (missileTooltipTimer) clearTimeout(missileTooltipTimer);
+      
+      missileTooltipTimer = setTimeout(() => {
+        const missile = missiles[missileKey];
+        if (missile) {
+          document.getElementById("tooltipName").textContent = missile.name;
+document.getElementById("tooltipGuidance").textContent = missile.guidanceEN + " | " + missile.guidance;
+document.getElementById("tooltipFuse").textContent = missile.fuseEN + " | " + missile.fuse;
+document.getElementById("tooltipWarhead").textContent = missile.warheadEN + " | " + missile.warhead;
+document.getElementById("tooltipArming").textContent = missile.armingText;
+document.getElementById("tooltipContext").textContent = missile.context;
+          
+          const tooltip = document.getElementById("missileTooltip");
+          tooltip.style.left = (event.clientX + 10) + "px";
+          tooltip.style.top = (event.clientY + 10) + "px";
+          tooltip.classList.add("show");
+        }
+      }, 500);
+    }
+  }
+});
+
+rocketSelect.addEventListener("mouseleave", function() {
+  if (missileTooltipTimer) {
+    clearTimeout(missileTooltipTimer);
+    missileTooltipTimer = null;
+  }
+  lastMissileKey = null;
+  document.getElementById("missileTooltip").classList.remove("show");
+});
+
+rocketSelect.addEventListener("click", function() {
+  if (rocketSelect.size <= 1) {
+    rocketSelect.size = rocketSelect.options.length;
+  } else {
+    rocketSelect.size = 1;
+    document.getElementById("missileTooltip").classList.remove("show");
+  }
+});
+
+document.addEventListener("click", function(event) {
+  if (event.target !== rocketSelect) {
+    rocketSelect.size = 1;
+    document.getElementById("missileTooltip").classList.remove("show");
+  }
+});
+
+// ========== TOOLTIPY DLA WYNIKÓW ==========
+const resultTooltipTimers = {};
+
+function showResultTooltip(tooltipId, event) {
+  if (resultTooltipTimers[tooltipId]) {
+    clearTimeout(resultTooltipTimers[tooltipId]);
+  }
+  
+  resultTooltipTimers[tooltipId] = setTimeout(() => {
+    const tooltip = document.getElementById(tooltipId);
+    tooltip.style.left = (event.clientX + 15) + "px";
+    tooltip.style.top = (event.clientY + 15) + "px";
+    tooltip.classList.add("show");
+  }, 500);
+}
+
+function hideResultTooltip(tooltipId) {
+  if (resultTooltipTimers[tooltipId]) {
+    clearTimeout(resultTooltipTimers[tooltipId]);
+    resultTooltipTimers[tooltipId] = null;
+  }
+  document.getElementById(tooltipId).classList.remove("show");
+}
+
+// ========== AUTO-PRZEWIJANIE STRZAŁEK ==========
 let arrowInterval = null;
-let currentArrowField = null;
-let currentArrowDelta = 0;
 
 function startArrow(fieldId, delta) {
-  currentArrowField = fieldId;
-  currentArrowDelta = delta;
-  
-  // Pierwsza zmiana natychmiast
   adjustFieldOnce(fieldId, delta);
   
-  // Po 500ms zaczyna się szybkie przewijanie
-  arrowInterval = setTimeout(function() {
-    arrowInterval = setInterval(function() {
-      adjustFieldOnce(fieldId, delta);
-    }, 50); // 50ms = 20 razy na sekundę
+  arrowInterval = setTimeout(() => {
+    arrowInterval = setInterval(() => adjustFieldOnce(fieldId, delta), 50);
   }, 500);
 }
 
@@ -580,25 +793,21 @@ function adjustFieldOnce(fieldId, delta) {
   const field = document.getElementById(fieldId);
   if (!field) return;
   
-  let currentValue = parseFloat(field.value) || 0;
-  currentValue += delta;
+  let val = parseFloat(field.value) || 0;
+  val += delta;
   
-  if (fieldId === 'kurs') {
-    if (currentValue < 0) currentValue = 360;
-    if (currentValue > 360) currentValue = 0;
+  if (fieldId === "kurs") {
+    if (val < 0) val = 360;
+    if (val > 360) val = 0;
   }
   
-  if (fieldId === 'vt' && currentValue < 0) currentValue = 0;
+  if (fieldId === "vt" && val < 0) val = 0;
   
-  field.value = currentValue.toFixed(fieldId === 'vt' ? 0 : 1);
+  field.value = val.toFixed(fieldId === "vt" ? 0 : 1);
   
-  if (activeField) {
-    activeField.classList.remove("active");
-    activeField.style.borderColor = "";
-  }
+  if (activeField) activeField.classList.remove("active");
   activeField = field;
   field.classList.add("active");
-  field.style.borderColor = "var(--border-active)";
   
   checkMissileCompatibility();
 }
@@ -609,81 +818,21 @@ function stopArrow() {
     clearInterval(arrowInterval);
     arrowInterval = null;
   }
-  currentArrowField = null;
-  currentArrowDelta = 0;
-}
-
-// ========== TOOLTIP DLA RAKIET ==========
-let tooltipTimer = null;
-let isMouseOverSelect = false;
-
-function showMissileTooltip(event) {
-  isMouseOverSelect = true;
-  
-  // Aktualizuj tooltip dla aktualnie wybranej rakiety
-  updateTooltip();
-  
-  // Po 1 sekundzie pokaż tooltip
-  tooltipTimer = setTimeout(function() {
-    if (isMouseOverSelect) {
-      const tooltip = document.getElementById("missileTooltip");
-      tooltip.classList.add("show");
-      
-      // Pozycjonuj tooltip obok myszki
-      tooltip.style.left = (event.clientX + 10) + 'px';
-      tooltip.style.top = (event.clientY + 10) + 'px';
-    }
-  }, 1000);
-}
-
-function hideMissileTooltip() {
-  isMouseOverSelect = false;
-  if (tooltipTimer) {
-    clearTimeout(tooltipTimer);
-    tooltipTimer = null;
-  }
-  document.getElementById("missileTooltip").classList.remove("show");
-}
-
-function updateTooltip() {
-  const missileKey = document.getElementById("rakieta").value;
-  const missile = missiles[missileKey];
-  
-  if (!missile) return;
-  
-  document.getElementById("tooltipName").textContent = missile.name;
-  document.getElementById("tooltipGuidance").textContent = missile.guidance;
-  document.getElementById("tooltipFuse").textContent = missile.fuse;
-  document.getElementById("tooltipWarhead").textContent = missile.warhead;
-  document.getElementById("tooltipArming").textContent = missile.armingText;
-  document.getElementById("tooltipContext").textContent = missile.context;
 }
 
 // ========== INICJALIZACJA ==========
 window.addEventListener("DOMContentLoaded", () => {
-  updateTooltip();
   checkMissileCompatibility();
 });
 
 // ========== ZMIENNE INTERFEJSU ==========
 let activeField = null;
 
-// Inicjalizacja pól
 document.querySelectorAll(".input-field").forEach(field => {
   field.addEventListener("click", function() {
-    if (activeField) {
-      activeField.classList.remove("active");
-      activeField.style.borderColor = "";
-    }
+    if (activeField) activeField.classList.remove("active");
     activeField = this;
     this.classList.add("active");
-    this.style.borderColor = "var(--border-active)";
-  });
-  
-  field.addEventListener("blur", function() {
-    if (this === activeField) {
-      this.style.borderColor = "";
-    }
   });
   
   field.addEventListener("input", checkMissileCompatibility);
@@ -704,15 +853,15 @@ function clearField() {
 
 // ========== SPRAWDZANIE ZGODNOŚCI RAKIETY ==========
 function checkMissileCompatibility() {
-  const Sx = parseFloat(document.getElementById("sx").value) || 0;
-  const Sy = parseFloat(document.getElementById("sy").value) || 0;
-  const Tx = parseFloat(document.getElementById("tx").value) || 0;
-  const Ty = parseFloat(document.getElementById("ty").value) || 0;
-  const vT = parseFloat(document.getElementById("vt").value) || 0;
+  const Sx = +document.getElementById("sx").value || 0;
+  const Sy = +document.getElementById("sy").value || 0;
+  const Tx = +document.getElementById("tx").value || 0;
+  const Ty = +document.getElementById("ty").value || 0;
+  const vT = +document.getElementById("vt").value || 0;
   
   const missileKey = document.getElementById("rakieta").value;
   if (!missiles[missileKey]) {
-    updateStatus("⚠️ SELECT MISSILE", "warning");
+    updateStatus("⚠️ WYBIERZ RAKIETĘ", "warning");
     return;
   }
   
@@ -720,67 +869,65 @@ function checkMissileCompatibility() {
   
   const allFilled = Sx !== 0 || Sy !== 0 || Tx !== 0 || Ty !== 0 || vT !== 0;
   if (!allFilled) {
-    updateStatus("ENTER TARGET DATA", "neutral");
+    updateStatus("WPISZ DANE CELU", "neutral");
     return;
   }
   
   const distance = Math.hypot(Tx - Sx, Ty - Sy);
   
   if (distance > missile.range) {
-    updateStatus(`❌ OUT OF RANGE (${distance.toFixed(0)} > ${missile.range}km)`, "error");
+    updateStatus(`❌ POZA ZASIĘGIEM (${distance.toFixed(0)} > ${missile.range}km)`, "error");
     return;
   }
   
   if (missile.arming > 0 && distance < missile.arming) {
-    updateStatus(`❌ TOO CLOSE (min ${missile.arming}km)`, "error");
+    updateStatus(`❌ ZA BLISKO (min ${missile.arming}km)`, "error");
     return;
   }
   
-  updateStatus(`✓ ${missile.name.split(' ')[0]} READY`, "success");
+  updateStatus(`✓ ${missile.name.split(" ")[0]} GOTOWA`, "success");
 }
 
 // ========== AKTUALIZACJA STATUSU ==========
 function updateStatus(message, type) {
   const statusText = document.getElementById("statusText");
   const statusIcon = document.getElementById("statusIcon");
-  const statusContainer = document.getElementById("statusContainer");
   
   statusText.textContent = message;
   statusText.classList.remove("status-valid");
-  statusContainer.style.color = "";
   
   switch(type) {
     case "success":
       statusIcon.textContent = "✓";
       statusText.classList.add("status-valid");
-      statusContainer.style.color = "var(--success)";
+      statusText.style.color = statusIcon.style.color = "var(--success)";
       break;
     case "error":
       statusIcon.textContent = "❌";
-      statusContainer.style.color = "#ff4444";
+      statusText.style.color = statusIcon.style.color = "#ff4444";
       break;
     case "warning":
       statusIcon.textContent = "⚠️";
-      statusContainer.style.color = "var(--warning)";
+      statusText.style.color = statusIcon.style.color = "var(--warning)";
       break;
     default:
       statusIcon.textContent = "ⓘ";
-      statusContainer.style.color = "var(--text-dim)";
+      statusText.style.color = statusIcon.style.color = "var(--text-dim)";
   }
 }
 
 // ========== GŁÓWNE OBLICZENIA ==========
 function calculateTarget() {
-  const Sx = parseFloat(document.getElementById("sx").value) || 0;
-  const Sy = parseFloat(document.getElementById("sy").value) || 0;
-  const Tx = parseFloat(document.getElementById("tx").value) || 0;
-  const Ty = parseFloat(document.getElementById("ty").value) || 0;
-  const vT = parseFloat(document.getElementById("vt").value) || 0;
-  const kursDeg = parseFloat(document.getElementById("kurs").value) || 0;
+  const Sx = +document.getElementById("sx").value || 0;
+  const Sy = +document.getElementById("sy").value || 0;
+  const Tx = +document.getElementById("tx").value || 0;
+  const Ty = +document.getElementById("ty").value || 0;
+  const vT = +document.getElementById("vt").value || 0;
+  const kursDeg = +document.getElementById("kurs").value || 0;
   
   const missileKey = document.getElementById("rakieta").value;
   if (!missiles[missileKey]) {
-    updateStatus("❌ SELECT MISSILE", "error");
+    updateStatus("❌ WYBIERZ RAKIETĘ", "error");
     return;
   }
   
@@ -795,30 +942,30 @@ function calculateTarget() {
   const b = 2 * (rx * vx + ry * vy);
   const c = rx * rx + ry * ry;
   
-  const discriminant = b * b - 4 * a * c;
+  const d = b * b - 4 * a * c;
   
-  if (discriminant < 0) {
-    updateStatus("❌ NO INTERCEPT SOLUTION", "error");
+  if (d < 0) {
+    updateStatus("❌ BRAK ROZWIĄZANIA", "error");
     return;
   }
   
-  const sqrtD = Math.sqrt(discriminant);
+  const sqrtD = Math.sqrt(d);
   const t1 = (-b - sqrtD) / (2 * a);
   const t2 = (-b + sqrtD) / (2 * a);
-  const validTimes = [t1, t2].filter(t => t >= 0);
+  const ts = [t1, t2].filter(t => t >= 0);
   
-  if (validTimes.length === 0) {
-    updateStatus("❌ NO POSITIVE TIME", "error");
+  if (ts.length === 0) {
+    updateStatus("❌ BRAK CZASU SPOTKANIA", "error");
     return;
   }
   
-  const t = Math.min(...validTimes);
+  const t = Math.min(...ts);
   const Px = Tx + vx * t;
   const Py = Ty + vy * t;
   const distToImpact = Math.hypot(Px - Sx, Py - Sy);
   
   if (distToImpact > missile.range) {
-    updateStatus(`❌ OUT OF RANGE (${distToImpact.toFixed(0)} > ${missile.range})`, "error");
+    updateStatus(`❌ POZA ZASIĘGIEM (${distToImpact.toFixed(0)} > ${missile.range})`, "error");
     return;
   }
   
@@ -838,7 +985,7 @@ function calculateTarget() {
   }
   
   if (missile.arming > 0 && markerDist < missile.arming) {
-    updateStatus(`❌ MIN DISTANCE: ${missile.arming}KM`, "error");
+    updateStatus(`❌ MIN ODLEGŁOŚĆ: ${missile.arming}KM`, "error");
     return;
   }
   
@@ -851,7 +998,7 @@ function calculateTarget() {
   document.getElementById("bearing").textContent = `${bearingDeg.toFixed(0)}°`;
   document.getElementById("optimal").textContent = `${optimalRange.toFixed(0)} km`;
   
-  updateStatus(`✓ ${missile.name.split(' ')[0]} SOLUTION READY`, "success");
+  updateStatus(`✓ ${missile.name.split(" ")[0]} ROZWIĄZANIE GOTOWE`, "success");
 }
 </script>
 </body>
