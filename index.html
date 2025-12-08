@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TARGETING COMPUTER - HIGHFLEET</title>
+<style>
+  /* ========== KOLORY HIGHFLEET ========== */
+  :root {
+    --bg: #000000;
+    --accent: #ffaa00;
+    --accent-dark: #cc8800;
+    --panel: #0a0a0a;
+    --field: #111111;
+    --border: #ffaa00;
+    --border-active: #ffffff;
+    --placeholder: #666666;
+    --text-dim: #888888;
+    --text-light: #cccccc;
+    --warning: #ff5500;
+    --success: #00ff00;
+    --arrow: #444444;
+    --tooltip-bg: #1a1a1a;
+  }
+
+  /* ========== PODSTAWY ========== */
+  body {
+    background: var(--bg);
+    color: var(--accent);
+    font-family: 'Courier New', monospace;
+    margin: 0;
+    padding: 8px;
+    font-size: 11px;
+    max-width: 380px;
+    margin: 0 auto;
+    overflow: hidden;
+  }
+
+  /* ========== NAGŁÓWEK ========== */
+  .header {
+    text-align: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--accent);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+
+  .header h1 {
+    font-size: 13px;
+    margin: 0;
+    font-weight: normal;
+  }
+
+  /* ========== SIATKA WEJŚCIA ========== */
+  .input-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  /* ========== POLE ZE STRZAŁKAMI ========== */
+  .input-container {
+    position: relative;
+  }
+
+  .input-field {
+    width: 100%;
+    height: 32px;
+    background: var(--field);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 12px;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    padding: 0 4px;
+    box-sizing: border-box;
+    text-transform: uppercase;
+    padding-right: 20px;
+  }
+
+  .input-field::placeholder {
+    color: var(--placeholder);
+    font-size: 10px;
+  }
+
+  .input-field.active {
+    border: 2px solid var(--border-active);
+    background: #1a1a1a;
+  }
+
+  /* ========== STRZAŁKI ========== */
+  .arrow-controls {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 24px;
+  }
+
+  .arrow-btn {
+    width: 12px;
+    height: 10px;
+    background: transparent;
+    border: none;
+    color: var(--arrow);
+    font-size: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .arrow-btn:hover {
+    color: var(--accent);
+  }
+
+  .arrow-btn:active {
+    color: #ffffff;
+  }
+
+  /* ========== SELEKTOR RAKIET (Z TOOLTIPEM) ========== */
+  .rocket-select-container {
+    position: relative;
+    margin: 8px 0;
+  }
+
+  .rocket-select {
+    width: 100%;
+    padding: 6px;
+    font-size: 11px;
+    background: var(--field);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  /* ========== TOOLTIP DLA RAKIET ========== */
+  .missile-tooltip {
+    position: fixed;
+    background: var(--tooltip-bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 8px;
+    font-size: 9px;
+    color: var(--text-light);
+    line-height: 1.4;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    max-width: 300px;
+    pointer-events: none;
+  }
+
+  .missile-tooltip.show {
+    display: block;
+  }
+
+  .tooltip-title {
+    color: var(--accent);
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+
+  .tooltip-item {
+    margin-bottom: 3px;
+    display: flex;
+  }
+
+  .tooltip-label {
+    color: var(--text-dim);
+    min-width: 80px;
+  }
+
+  .tooltip-value {
+    color: var(--text-light);
+    flex: 1;
+  }
+
+  /* ========== PANEL CELOWANIA ========== */
+  .targeting-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 10px;
+    margin: 10px 0;
+    position: relative;
+  }
+
+  .target-line {
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 16px;
+  }
+
+  .target-label {
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+
+  .target-value {
+    color: var(--accent);
+    text-align: right;
+    font-size: 11px;
+    font-weight: bold;
+  }
+
+  /* ========== STATUS ========== */
+  .status-line {
+    color: var(--text-dim);
+    font-size: 9px;
+    text-align: center;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px dashed var(--accent-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  .status-valid {
+    color: var(--success) !important;
+  }
+
+  .status-icon {
+    font-size: 10px;
+  }
+
+  /* ========== KLAWIATURA I PRZYCISK ========== */
+  .bottom-section {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: end;
+  }
+
+  /* ========== KLAWIATURA (3x4 + CLEAR W 2 KOLUMNACH) ========== */
+  .keyboard {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    grid-template-rows: repeat(4, 36px);
+    align-items: end;
+  }
+
+  .key {
+    background: var(--field);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: 'Courier New', monospace;
+    user-select: none;
+    height: 100%;
+  }
+
+  .key:active {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .key-clear {
+  /* USUŃ: grid-column: span 2; */
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.key-compute {
+  font-size: 9px; /* Zmniejszona czcionka */
+  text-transform: uppercase;
+  background: var(--field);
+  color: var(--accent);
+  line-height: 1.1; /* Lepsze odstępy dla małej czcionki */
+  text-align: center;
+  padding: 2px;
+}
+
+.key-compute:active {
+  background: var(--accent);
+  color: #000;
+}
+
+  /* ========== PRZYCISK OGNIA (POD CYFRĄ 9, WYSOKOŚĆ JAK CLEAR) ========== */
+  .fire-btn-container {
+    display: flex;
+    flex-direction: column;
+    height: calc(36px + 36px + 5px); /* Wysokość jak CLEAR (36px) + wyrównanie */
+  }
+
+  .fire-btn {
+    width: 76px; /* Taka sama szerokość jak klawisze (1fr = ~76px) */
+    height: 36px; /* Taka sama wysokość jak CLEAR */
+    background: linear-gradient(to bottom, #000000, #111111);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 9px;
+    text-transform: uppercase;
+    font-family: 'Courier New', monospace;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    transition: all 0.2s;
+    box-shadow: 0 0 10px rgba(255, 170, 0, 0.2);
+    text-align: center;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  .fire-btn:active {
+    background: var(--accent);
+    color: #000000;
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.5);
+  }
+
+  /* ========== STOPKA ========== */
+  .footer {
+    font-size: 8px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== NAGŁÓWEK ========== -->
+<div class="header">
+  <h1>TARGETING COMPUTER</h1>
+</div>
+
+<!-- ========== DANE WEJŚCIOWE ========== -->
+<div class="input-grid">
+  <div class="input-container">
+    <input id="sx" class="input-field" type="text" maxlength="6" placeholder="OUR X" readonly>
+    <div class="arrow-controls">
+      <button class="arrow-btn" onmousedown="startArrow('sx', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
+      <button class="arrow-btn" onmousedown="startArrow('sx', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
+    </div>
+  </div>
+  <div class="input-container">
+    <input id="sy" class="input-field" type="text" maxlength="6" placeholder="OUR Y" readonly>
+    <div class="arrow-controls">
+      <button class="arrow-btn" onmousedown="startArrow('sy', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
+      <button class="arrow-btn" onmousedown="startArrow('sy', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
+    </div>
+  </div>
+  <div class="input-container">
+    <input id="tx" class="input-field" type="text" maxlength="6" placeholder="TARGET X" readonly>
+    <div class="arrow-controls">
+      <button class="arrow-btn" onmousedown="startArrow('tx', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
+      <button class="arrow-btn" onmousedown="startArrow('tx', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
+    </div>
+  </div>
+  <div class="input-container">
+    <input id="ty" class="input-field" type="text" maxlength="6" placeholder="TARGET Y" readonly>
+    <div class="arrow-controls">
+      <button class="arrow-btn" onmousedown="startArrow('ty', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
+      <button class="arrow-btn" onmousedown="startArrow('ty', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
+    </div>
+  </div>
+  <div class="input-container">
+    <input id="vt" class="input-field" type="text" maxlength="5" placeholder="SPEED" readonly>
+    <div class="arrow-controls">
+      <button class="arrow-btn" onmousedown="startArrow('vt', 10)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
+      <button class="arrow-btn" onmousedown="startArrow('vt', -10)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
+    </div>
+  </div>
+  <div class="input-container">
+    <input id="kurs" class="input-field" type="text" maxlength="5" placeholder="BEARING" readonly>
+    <div class="arrow-controls">
+      <button class="arrow-btn" onmousedown="startArrow('kurs', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
+      <button class="arrow-btn" onmousedown="startArrow('kurs', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== WYBÓR RAKIETY (Z TOOLTIPEM) ========== -->
+<div class="rocket-select-container">
+  <select id="rakieta" class="rocket-select" onchange="checkMissileCompatibility(); updateTooltip()" 
+          onmouseover="showMissileTooltip(event)" onmouseout="hideMissileTooltip()">
+    <optgroup label="CRUISE MISSILES">
+      <option value="Kh15">KH-15 (1600km, 900km/h)</option>
+      <option value="Kh22">KH-22 (2500km, 1200km/h)</option>
+    </optgroup>
+    <optgroup label="TACTICAL">
+      <option value="A100">A-100 (400km, 4000km/h)</option>
+      <option value="R9">R-9 SPRINT (200km, 5000km/h)</option>
+    </optgroup>
+    <optgroup label="AIR-TO-AIR">
+      <option value="K13">K-13 AAM (30km, 2000km/h)</option>
+    </optgroup>
+  </select>
+</div>
+
+<!-- TOOLTIP (oddzielny element) -->
+<div class="missile-tooltip" id="missileTooltip">
+  <div class="tooltip-title" id="tooltipName">KH-15 CRUISE MISSILE</div>
+  <div class="tooltip-item">
+    <span class="tooltip-label">Naprowadzanie:</span>
+    <span class="tooltip-value" id="tooltipGuidance">Aktywny radar</span>
+  </div>
+  <div class="tooltip-item">
+    <span class="tooltip-label">Zapalnik:</span>
+    <span class="tooltip-value" id="tooltipFuse">Zapalnik zbliżeniowy</span>
+  </div>
+  <div class="tooltip-item">
+    <span class="tooltip-label">Głowica:</span>
+    <span class="tooltip-value" id="tooltipWarhead">Burząca / Jądrowa</span>
+  </div>
+  <div class="tooltip-item">
+    <span class="tooltip-label">Uzbrojenie:</span>
+    <span class="tooltip-value" id="tooltipArming">100 km od startu</span>
+  </div>
+  <div class="tooltip-item">
+    <span class="tooltip-label">Kontekst:</span>
+    <span class="tooltip-value" id="tooltipContext">Rakieta przeciwradiacyjna, niszczy systemy radarowe</span>
+  </div>
+</div>
+
+<!-- ========== WYNIKI CELOWANIA ========== -->
+<div class="targeting-panel" id="wynik">
+  <div class="target-line">
+    <span class="target-label">MARKER COORDS:</span>
+    <span class="target-value" id="marker">---, --- km</span>
+  </div>
+  <div class="target-line">
+    <span class="target-label">DISTANCE:</span>
+    <span class="target-value" id="distance">--- km</span>
+  </div>
+  <div class="target-line">
+    <span class="target-label">BEARING:</span>
+    <span class="target-value" id="bearing">---°</span>
+  </div>
+  <div class="target-line">
+    <span class="target-label">OPTIMAL RANGE:</span>
+    <span class="target-value" id="optimal">--- km</span>
+  </div>
+  
+  <!-- STATUS -->
+  <div class="status-line" id="statusContainer">
+    <span class="status-icon" id="statusIcon">⚠️</span>
+    <span id="statusText">ENTER TARGET DATA</span>
+  </div>
+</div>
+
+<!-- ========== DOLNA SEKCJA: KLAWIATURA + PRZYCISK ========== -->
+<div class="keyboard">
+  <div class="key" onclick="press('1')">1</div>
+  <div class="key" onclick="press('2')">2</div>
+  <div class="key" onclick="press('3')">3</div>
+  <div class="key" onclick="press('4')">4</div>
+  <div class="key" onclick="press('5')">5</div>
+  <div class="key" onclick="press('6')">6</div>
+  <div class="key" onclick="press('7')">7</div>
+  <div class="key" onclick="press('8')">8</div>
+  <div class="key" onclick="press('9')">9</div>
+  
+  <!-- DOLNY RZĄD -->
+  <div class="key" onclick="press('0')">0</div>
+  <div class="key key-clear" onclick="clearField()">CLEAR</div>
+  <div class="key key-compute" onclick="calculateTarget()">COMPUTE FIRING SOLUTION</div>
+</div>
+</div>
+
+<!-- ========== STOPKA ========== -->
+<div class="footer">
+  HIGHFLEET TARGETING SYSTEM v2.0
+</div>
+
+<script>
+// ========== KONFIGURACJA RAKIET ==========
+const missiles = {
+  "Kh15": { 
+    speed: 900,
+    range: 1600,
+    arming: 100,
+    guidance: "INDIRECT GUIDANCE",
+    fuse: "PROXIMITY FUSE",
+    warhead: "HIGH-EXPLOSIVE WARHEAD / NUCLEAR WARHEAD",
+    armingText: "100 km od startu",
+    context: "Rakieta przeciwradiacyjna (ARM), namierza źródła radarowe. Uzbraja się po 100 km lotu.",
+    name: "KH-15 CRUISE MISSILE"
+  },
+  "Kh22": { 
+    speed: 1200,
+    range: 2500,
+    arming: 100,
+    guidance: "INDIRECT GUIDANCE",
+    fuse: "PROXIMITY FUSE",
+    warhead: "HIGH-EXPLOSIVE WARHEAD / NUCLEAR WARHEAD",
+    armingText: "100 km od startu",
+    context: "Ciężka rakieta manewrująca. Skuteczna przeciwko dużym celom naziemnym i morskim.",
+    name: "KH-22 CRUISE MISSILE"
+  },
+  "A100": { 
+    speed: 4000,
+    range: 400,
+    arming: 0,
+    guidance: "DIRECT GUIDANCE",
+    fuse: "PROXIMITY FUSE",
+    warhead: "FRAGMENTATION WARHEAD",
+    armingText: "Natychmiastowa gotowość",
+    context: "Rakieta taktyczna przeciwlotnicza. Bardzo szybka, skuteczna przeciw samolotom i rakietom.",
+    name: "A-100 TACTICAL MISSILE"
+  },
+  "R9": { 
+    speed: 5000,
+    range: 200,
+    arming: 0,
+    guidance: "DIRECT GUIDANCE",
+    fuse: "PROXIMITY FUSE",
+    warhead: "FRAGMENTATION WARHEAD",
+    armingText: "Natychmiastowa gotowość",
+    context: "System obrony punktowej. Automatyczne naprowadzanie na cele powietrzne.",
+    name: "R-9 SPRINT AA MISSILE"
+  },
+  "K13": { 
+    speed: 2000,
+    range: 30,
+    arming: 0,
+    guidance: "HEAT‑SEEKING",
+    fuse: "PROXIMITY FUSE",
+    warhead: "FRAGMENTATION WARHEAD",
+    armingText: "Natychmiastowa gotowość",
+    context: "Powietrze-powietrze. Naprowadzanie na podczerwień (podatna na flary).",
+    name: "K-13 AIR-TO-AIR MISSILE"
+  }
+};
+
+// ========== ZMIENNE DLA STRZAŁEK (auto-przewijanie) ==========
+let arrowInterval = null;
+let currentArrowField = null;
+let currentArrowDelta = 0;
+
+function startArrow(fieldId, delta) {
+  currentArrowField = fieldId;
+  currentArrowDelta = delta;
+  
+  // Pierwsza zmiana natychmiast
+  adjustFieldOnce(fieldId, delta);
+  
+  // Po 500ms zaczyna się szybkie przewijanie
+  arrowInterval = setTimeout(function() {
+    arrowInterval = setInterval(function() {
+      adjustFieldOnce(fieldId, delta);
+    }, 50); // 50ms = 20 razy na sekundę
+  }, 500);
+}
+
+function adjustFieldOnce(fieldId, delta) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  
+  let currentValue = parseFloat(field.value) || 0;
+  currentValue += delta;
+  
+  if (fieldId === 'kurs') {
+    if (currentValue < 0) currentValue = 360;
+    if (currentValue > 360) currentValue = 0;
+  }
+  
+  if (fieldId === 'vt' && currentValue < 0) currentValue = 0;
+  
+  field.value = currentValue.toFixed(fieldId === 'vt' ? 0 : 1);
+  
+  if (activeField) {
+    activeField.classList.remove("active");
+    activeField.style.borderColor = "";
+  }
+  activeField = field;
+  field.classList.add("active");
+  field.style.borderColor = "var(--border-active)";
+  
+  checkMissileCompatibility();
+}
+
+function stopArrow() {
+  if (arrowInterval) {
+    clearTimeout(arrowInterval);
+    clearInterval(arrowInterval);
+    arrowInterval = null;
+  }
+  currentArrowField = null;
+  currentArrowDelta = 0;
+}
+
+// ========== TOOLTIP DLA RAKIET ==========
+let tooltipTimer = null;
+let isMouseOverSelect = false;
+
+function showMissileTooltip(event) {
+  isMouseOverSelect = true;
+  
+  // Aktualizuj tooltip dla aktualnie wybranej rakiety
+  updateTooltip();
+  
+  // Po 1 sekundzie pokaż tooltip
+  tooltipTimer = setTimeout(function() {
+    if (isMouseOverSelect) {
+      const tooltip = document.getElementById("missileTooltip");
+      tooltip.classList.add("show");
+      
+      // Pozycjonuj tooltip obok myszki
+      tooltip.style.left = (event.clientX + 10) + 'px';
+      tooltip.style.top = (event.clientY + 10) + 'px';
+    }
+  }, 1000);
+}
+
+function hideMissileTooltip() {
+  isMouseOverSelect = false;
+  if (tooltipTimer) {
+    clearTimeout(tooltipTimer);
+    tooltipTimer = null;
+  }
+  document.getElementById("missileTooltip").classList.remove("show");
+}
+
+function updateTooltip() {
+  const missileKey = document.getElementById("rakieta").value;
+  const missile = missiles[missileKey];
+  
+  if (!missile) return;
+  
+  document.getElementById("tooltipName").textContent = missile.name;
+  document.getElementById("tooltipGuidance").textContent = missile.guidance;
+  document.getElementById("tooltipFuse").textContent = missile.fuse;
+  document.getElementById("tooltipWarhead").textContent = missile.warhead;
+  document.getElementById("tooltipArming").textContent = missile.armingText;
+  document.getElementById("tooltipContext").textContent = missile.context;
+}
+
+// ========== INICJALIZACJA ==========
+window.addEventListener("DOMContentLoaded", () => {
+  updateTooltip();
+  checkMissileCompatibility();
+});
+
+// ========== ZMIENNE INTERFEJSU ==========
+let activeField = null;
+
+// Inicjalizacja pól
+document.querySelectorAll(".input-field").forEach(field => {
+  field.addEventListener("click", function() {
+    if (activeField) {
+      activeField.classList.remove("active");
+      activeField.style.borderColor = "";
+    }
+    activeField = this;
+    this.classList.add("active");
+    this.style.borderColor = "var(--border-active)";
+  });
+  
+  field.addEventListener("blur", function() {
+    if (this === activeField) {
+      this.style.borderColor = "";
+    }
+  });
+  
+  field.addEventListener("input", checkMissileCompatibility);
+});
+
+// ========== FUNKCJE KLAWIATURY ==========
+function press(val) {
+  if (!activeField) return;
+  activeField.value += val;
+  checkMissileCompatibility();
+}
+
+function clearField() {
+  if (!activeField) return;
+  activeField.value = "";
+  checkMissileCompatibility();
+}
+
+// ========== SPRAWDZANIE ZGODNOŚCI RAKIETY ==========
+function checkMissileCompatibility() {
+  const Sx = parseFloat(document.getElementById("sx").value) || 0;
+  const Sy = parseFloat(document.getElementById("sy").value) || 0;
+  const Tx = parseFloat(document.getElementById("tx").value) || 0;
+  const Ty = parseFloat(document.getElementById("ty").value) || 0;
+  const vT = parseFloat(document.getElementById("vt").value) || 0;
+  
+  const missileKey = document.getElementById("rakieta").value;
+  if (!missiles[missileKey]) {
+    updateStatus("⚠️ SELECT MISSILE", "warning");
+    return;
+  }
+  
+  const missile = missiles[missileKey];
+  
+  const allFilled = Sx !== 0 || Sy !== 0 || Tx !== 0 || Ty !== 0 || vT !== 0;
+  if (!allFilled) {
+    updateStatus("ENTER TARGET DATA", "neutral");
+    return;
+  }
+  
+  const distance = Math.hypot(Tx - Sx, Ty - Sy);
+  
+  if (distance > missile.range) {
+    updateStatus(`❌ OUT OF RANGE (${distance.toFixed(0)} > ${missile.range}km)`, "error");
+    return;
+  }
+  
+  if (missile.arming > 0 && distance < missile.arming) {
+    updateStatus(`❌ TOO CLOSE (min ${missile.arming}km)`, "error");
+    return;
+  }
+  
+  updateStatus(`✓ ${missile.name.split(' ')[0]} READY`, "success");
+}
+
+// ========== AKTUALIZACJA STATUSU ==========
+function updateStatus(message, type) {
+  const statusText = document.getElementById("statusText");
+  const statusIcon = document.getElementById("statusIcon");
+  const statusContainer = document.getElementById("statusContainer");
+  
+  statusText.textContent = message;
+  statusText.classList.remove("status-valid");
+  statusContainer.style.color = "";
+  
+  switch(type) {
+    case "success":
+      statusIcon.textContent = "✓";
+      statusText.classList.add("status-valid");
+      statusContainer.style.color = "var(--success)";
+      break;
+    case "error":
+      statusIcon.textContent = "❌";
+      statusContainer.style.color = "#ff4444";
+      break;
+    case "warning":
+      statusIcon.textContent = "⚠️";
+      statusContainer.style.color = "var(--warning)";
+      break;
+    default:
+      statusIcon.textContent = "ⓘ";
+      statusContainer.style.color = "var(--text-dim)";
+  }
+}
+
+// ========== GŁÓWNE OBLICZENIA ==========
+function calculateTarget() {
+  const Sx = parseFloat(document.getElementById("sx").value) || 0;
+  const Sy = parseFloat(document.getElementById("sy").value) || 0;
+  const Tx = parseFloat(document.getElementById("tx").value) || 0;
+  const Ty = parseFloat(document.getElementById("ty").value) || 0;
+  const vT = parseFloat(document.getElementById("vt").value) || 0;
+  const kursDeg = parseFloat(document.getElementById("kurs").value) || 0;
+  
+  const missileKey = document.getElementById("rakieta").value;
+  if (!missiles[missileKey]) {
+    updateStatus("❌ SELECT MISSILE", "error");
+    return;
+  }
+  
+  const missile = missiles[missileKey];
+  const kursRad = kursDeg * Math.PI / 180;
+  const vx = vT * Math.cos(kursRad);
+  const vy = vT * Math.sin(kursRad);
+  const rx = Tx - Sx;
+  const ry = Ty - Sy;
+  
+  const a = vx * vx + vy * vy - missile.speed * missile.speed;
+  const b = 2 * (rx * vx + ry * vy);
+  const c = rx * rx + ry * ry;
+  
+  const discriminant = b * b - 4 * a * c;
+  
+  if (discriminant < 0) {
+    updateStatus("❌ NO INTERCEPT SOLUTION", "error");
+    return;
+  }
+  
+  const sqrtD = Math.sqrt(discriminant);
+  const t1 = (-b - sqrtD) / (2 * a);
+  const t2 = (-b + sqrtD) / (2 * a);
+  const validTimes = [t1, t2].filter(t => t >= 0);
+  
+  if (validTimes.length === 0) {
+    updateStatus("❌ NO POSITIVE TIME", "error");
+    return;
+  }
+  
+  const t = Math.min(...validTimes);
+  const Px = Tx + vx * t;
+  const Py = Ty + vy * t;
+  const distToImpact = Math.hypot(Px - Sx, Py - Sy);
+  
+  if (distToImpact > missile.range) {
+    updateStatus(`❌ OUT OF RANGE (${distToImpact.toFixed(0)} > ${missile.range})`, "error");
+    return;
+  }
+  
+  let markerX, markerY, markerDist, bearing;
+  
+  if (missile.arming > 0) {
+    const bearingToTarget = Math.atan2(Py - Sy, Px - Sx);
+    markerX = Px - missile.arming * Math.cos(bearingToTarget);
+    markerY = Py - missile.arming * Math.sin(bearingToTarget);
+    markerDist = Math.hypot(markerX - Sx, markerY - Sy);
+    bearing = Math.atan2(markerY - Sy, markerX - Sx);
+  } else {
+    markerX = Px;
+    markerY = Py;
+    markerDist = distToImpact;
+    bearing = Math.atan2(Py - Sy, Px - Sx);
+  }
+  
+  if (missile.arming > 0 && markerDist < missile.arming) {
+    updateStatus(`❌ MIN DISTANCE: ${missile.arming}KM`, "error");
+    return;
+  }
+  
+  const optimalRange = missile.arming + 50;
+  let bearingDeg = bearing * 180 / Math.PI;
+  if (bearingDeg < 0) bearingDeg += 360;
+  
+  document.getElementById("marker").textContent = `${markerX.toFixed(0)}, ${markerY.toFixed(0)} km`;
+  document.getElementById("distance").textContent = `${markerDist.toFixed(0)} km`;
+  document.getElementById("bearing").textContent = `${bearingDeg.toFixed(0)}°`;
+  document.getElementById("optimal").textContent = `${optimalRange.toFixed(0)} km`;
+  
+  updateStatus(`✓ ${missile.name.split(' ')[0]} SOLUTION READY`, "success");
+}
+</script>
+</body>
+</html>
