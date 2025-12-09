@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>HF-INTERCEPT COMPUTER</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
 <style>
   :root {
     --bg: #000000;
@@ -12,14 +14,18 @@
     --panel: #0a0a0a;
     --field: #111111;
     --border: #ffaa00;
-    --border-active: #ffffff;
+    --border-active: #ffaa00;
     --placeholder: #666666;
     --text-dim: #888888;
     --text-light: #cccccc;
     --warning: #ff5500;
-    --success: #00ff00;
+    --success: #00b600;
     --arrow: #444444;
     --tooltip-bg: #1a1a1a;
+    --missile-bg: #111111;
+    --missile-hover: #1a1a1a;
+    --missile-active: #2a2a2a;
+    --group-header: #333333;
   }
 
   body {
@@ -28,10 +34,10 @@
     font-family: 'Courier New', monospace;
     margin: 0;
     padding: 8px;
-    font-size: 11px;
+    font-size: 15px;
     max-width: 380px;
     margin: 0 auto;
-    overflow: hidden;
+    overflow-x: hidden;
   }
 
   .header {
@@ -44,7 +50,7 @@
   }
 
   .header h1 {
-    font-size: 13px;
+    font-size: 18px;
     margin: 0;
     font-weight: normal;
   }
@@ -62,14 +68,14 @@
 
   .input-field {
     width: 100%;
-    height: 32px;
+    height: 50px;
     background: var(--field);
     color: var(--accent);
     border: 1px solid var(--border);
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 20px;
     text-align: center;
-    font-family: 'Courier New', monospace;
+    font-family: 'Orbitron', monospace;
     padding: 0 4px;
     box-sizing: border-box;
     text-transform: uppercase;
@@ -78,11 +84,14 @@
 
   .input-field::placeholder {
     color: var(--placeholder);
-    font-size: 10px;
+    font-size: 15px;
   }
+.input-field:focus {
+  outline: none;
+}
 
   .input-field.active {
-    border: 2px solid var(--border-active);
+    border: 3px solid var(--border-active);
     background: #1a1a1a;
   }
 
@@ -94,16 +103,16 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 24px;
+    height: 40px;
   }
 
   .arrow-btn {
-    width: 12px;
-    height: 10px;
+    width: 15px;
+    height: 15px;
     background: transparent;
     border: none;
     color: var(--arrow);
-    font-size: 8px;
+    font-size: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -114,106 +123,166 @@
     -webkit-user-select: none;
   }
 
-  .rocket-select-container {
-    position: relative;
-    margin: 8px 0;
-  }
+  /* UKRYTY SELECT */
+.rocket-select-hidden {
+  display: none !important;
+}
 
-  .rocket-select {
-    width: 100%;
-    padding: 6px;
-    font-size: 11px;
-    background: var(--field);
-    color: var(--accent);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    font-family: 'Courier New', monospace;
-    cursor: pointer;
-  }
+/* CUSTOM MISSILE MENU */
+.missile-menu {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px;
+  margin: 8px 0;
+  max-height: 140px; /* ZMIENIONE z 200px na 140px (-30%) */
+  overflow-y: auto;
+}
 
-  .missile-tooltip {
-    position: fixed;
-    background: var(--tooltip-bg);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 8px;
-    font-size: 9px;
-    color: var(--text-light);
-    line-height: 1.4;
-    z-index: 1000;
-    display: none;
-    box-shadow: 0 0 10px rgba(0,0,0,0.5);
-    max-width: 300px;
-    pointer-events: none;
-  }
+/* STYLIZACJA SCROLLBARA */
+.missile-menu::-webkit-scrollbar {
+  width: 14px;
+}
 
-  .missile-tooltip.show {
-    display: block;
-  }
+.missile-menu::-webkit-scrollbar-track {
+  background: var(--field);
+  border-radius: 4px;
+}
 
-  .tooltip-title {
-    color: var(--accent);
-    font-weight: bold;
-    margin-bottom: 4px;
+.missile-menu::-webkit-scrollbar-thumb {
+  background: var(--accent-dark);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.missile-menu::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+.missile-group {
+  margin-bottom: 10px;
+}
+
+.missile-group:last-child {
+  margin-bottom: 0;
+}
+
+.missile-group-header {
+  color: var(--accent);
+  font-size: 15px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  padding-bottom: 3px;
+  border-bottom: 1px dashed var(--accent-dark);
+  letter-spacing: 0.5px;
+}
+
+.missile-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.missile-item {
+  background: var(--missile-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 6px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.1s;
+  user-select: none;
+}
+
+.missile-item:hover {
+  background: var(--missile-hover);
+  border-color: var(--text-light);
+}
+
+.missile-item.active {
+  background: var(--missile-active);
+  border-color: var(--success);
+  border-width: 2px;
+}
+
+.missile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.missile-name {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: bold;
     text-transform: uppercase;
-    font-size: 10px;
-  }
+}
 
-  .tooltip-item {
-    margin-bottom: 3px;
-    display: flex;
-  }
+.missile-stats {
+  color: var(--text-light);
+  font-size: 12px;
+}
 
-  .tooltip-label {
-    color: var(--text-dim);
-    min-width: 80px;
-  }
+.missile-purpose {
+  color: var(--text-dim);
+  font-size: 14px;
+  margin-top: 2px;
+  font-style: bold;
+  text-transform: uppercase;
 
-  .tooltip-value {
-    color: var(--text-light);
-    flex: 1;
-  }
+}
 
-  .targeting-panel {
-    background: var(--panel);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    padding: 10px;
-    margin: 10px 0;
-    position: relative;
-  }
-
-  .target-line {
-    margin-bottom: 5px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 16px;
-    position: relative;
-  }
-
-  .target-label {
-    color: var(--text-dim);
-    text-transform: uppercase;
-    font-size: 10px;
-    letter-spacing: 0.5px;
-    cursor: help;
-  }
-
-  .target-value {
-    color: var(--accent);
-    text-align: right;
-    font-size: 11px;
-    font-weight: bold;
-  }
-
-  .result-tooltip {
+.missile-tooltip {
   position: fixed;
   background: var(--tooltip-bg);
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 8px;
-  font-size: 10px;
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.4;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  max-width: 300px;
+  pointer-events: none;
+}
+
+.missile-tooltip.show {
+  display: block;
+}
+
+.tooltip-title {
+  color: var(--accent);
+  font-weight: bold;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.tooltip-item {
+  margin-bottom: 3px;
+  display: flex;
+}
+
+.tooltip-label {
+  color: var(--text-dim);
+  min-width: 80px;
+}
+
+.tooltip-value {
+  color: var(--text-light);
+  flex: 1;
+}
+
+.result-tooltip {
+  position: fixed;
+  background: var(--tooltip-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px;
+  font-size: 13px;
   color: var(--text-light);
   line-height: 1.4;
   z-index: 10000;
@@ -223,13 +292,13 @@
   pointer-events: none;
 }
 
-  .result-tooltip.show {
-    display: block;
-  }
+.result-tooltip.show {
+  display: block;
+}
 
   .status-line {
     color: var(--text-dim);
-    font-size: 9px;
+    font-size: 14px;
     text-align: center;
     margin-top: 6px;
     padding-top: 6px;
@@ -245,7 +314,7 @@
   }
 
   .status-icon {
-    font-size: 10px;
+    font-size: 12px;
   }
 
   .keyboard {
@@ -261,12 +330,12 @@
     color: var(--accent);
     border: 1px solid var(--border);
     border-radius: 3px;
-    font-size: 15px;
+    font-size: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-family: 'Courier New', monospace;
+    font-family: 'Orbitron', monospace;
     user-select: none;
   }
 
@@ -276,18 +345,18 @@
   }
 
   .key-clear {
-    font-size: 11px;
+    font-size: 15px;
     text-transform: uppercase;
   }
 
   .key-compute {
-    font-size: 9px;
+    font-size: 12px;
     text-transform: uppercase;
     background: var(--field);
     color: var(--accent);
-    line-height: 1.1;
+    line-height: 1.2;
     text-align: center;
-    padding: 2px;
+    padding: 0px;
   }
 
   .key-compute:active {
@@ -295,14 +364,106 @@
     color: #000;
   }
 
+  /* NOWY SZEROKI PRZYCISK */
+  .key-wide {
+    grid-column: span 3;
+    height: 36px;
+    background: var(--field);
+    color: var(--accent);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 12px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    user-select: none;
+    margin-top: 5px;
+  }
+
+  .key-wide:active {
+    background: var(--accent);
+    color: #000;
+  }
+
+  /* MAPA WSPÓŁRZĘDNYCH - NA SAMYM DOLE */
+  .map-container {
+    width: 100%;
+    height: 253px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-top: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #coordMap {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .map-labels {
+    position: absolute;
+    bottom: 5px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    font-size: 11px;
+    color: var(--text-dim);
+    pointer-events: none;
+  }
+
+  .map-label-left {
+    text-align: left;
+  }
+
+  .map-label-right {
+    text-align: right;
+  }
+
+  .map-label-center {
+    text-align: center;
+    flex-grow: 1;
+  }
+
   .footer {
-    font-size: 8px;
+    font-size: 14px;
     color: var(--text-dim);
     text-align: center;
     margin-top: 8px;
     padding-top: 6px;
     border-top: 1px solid var(--border);
   }
+  
+  /* FLOATING LABELS */
+.input-with-label {
+  position: relative;
+}
+
+.input-label {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 15px;
+  color: var(--placeholder);
+  pointer-events: none;
+  transition: all 0.2s;
+  font-family: 'Orbitron', monospace;
+  text-transform: uppercase;
+}
+
+.input-field:focus + .input-label,
+.input-field:not(:placeholder-shown) + .input-label {
+  top: 2px;
+  font-size: 12px;
+  color: var(--accent);
+}
 </style>
 </head>
 <body>
@@ -313,42 +474,65 @@
 
 <div class="input-grid">
   <div class="input-container">
-    <input id="sx" class="input-field" type="text" maxlength="6" placeholder="OUR X" readonly>
+    <div class="input-with-label">
+      <input id="sx" class="input-field" type="text" maxlength="4" placeholder=" " onkeydown="handleKeyInput(event, 'sx')" oninput="validateCoordinates(this)">
+      <label for="sx" class="input-label">OUR X</label>
+    </div>
     <div class="arrow-controls">
       <button class="arrow-btn" onmousedown="startArrow('sx', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
       <button class="arrow-btn" onmousedown="startArrow('sx', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
     </div>
   </div>
+  
   <div class="input-container">
-    <input id="sy" class="input-field" type="text" maxlength="6" placeholder="OUR Y" readonly>
+    <div class="input-with-label">
+      <input id="sy" class="input-field" type="text" maxlength="4" placeholder=" " onkeydown="handleKeyInput(event, 'sy')" oninput="validateCoordinates(this)">
+      <label for="sy" class="input-label">OUR Y</label>
+    </div>
     <div class="arrow-controls">
       <button class="arrow-btn" onmousedown="startArrow('sy', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
       <button class="arrow-btn" onmousedown="startArrow('sy', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
     </div>
   </div>
+  
   <div class="input-container">
-    <input id="tx" class="input-field" type="text" maxlength="6" placeholder="TARGET X" readonly>
+    <div class="input-with-label">
+      <input id="tx" class="input-field" type="text" maxlength="4" placeholder=" " onkeydown="handleKeyInput(event, 'tx')" oninput="validateCoordinates(this)">
+      <label for="tx" class="input-label">TARGET X</label>
+    </div>
     <div class="arrow-controls">
       <button class="arrow-btn" onmousedown="startArrow('tx', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
       <button class="arrow-btn" onmousedown="startArrow('tx', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
     </div>
   </div>
+  
   <div class="input-container">
-    <input id="ty" class="input-field" type="text" maxlength="6" placeholder="TARGET Y" readonly>
+    <div class="input-with-label">
+      <input id="ty" class="input-field" type="text" maxlength="4" placeholder=" " onkeydown="handleKeyInput(event, 'ty')" oninput="validateCoordinates(this)">
+      <label for="ty" class="input-label">TARGET Y</label>
+    </div>
     <div class="arrow-controls">
       <button class="arrow-btn" onmousedown="startArrow('ty', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
       <button class="arrow-btn" onmousedown="startArrow('ty', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
     </div>
   </div>
+  
   <div class="input-container">
-    <input id="vt" class="input-field" type="text" maxlength="5" placeholder="SPEED" readonly>
+    <div class="input-with-label">
+      <input id="vt" class="input-field" type="text" maxlength="4" placeholder=" " onkeydown="handleKeyInput(event, 'vt')" oninput="limitDigits(this, 4)">
+      <label for="vt" class="input-label">SPEED</label>
+    </div>
     <div class="arrow-controls">
       <button class="arrow-btn" onmousedown="startArrow('vt', 10)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
       <button class="arrow-btn" onmousedown="startArrow('vt', -10)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
     </div>
   </div>
+  
   <div class="input-container">
-    <input id="kurs" class="input-field" type="text" maxlength="5" placeholder="BEARING" readonly>
+    <div class="input-with-label">
+      <input id="kurs" class="input-field" type="text" maxlength="3" placeholder=" " onkeydown="handleKeyInput(event, 'kurs')" oninput="limitDigits(this, 3)">
+      <label for="kurs" class="input-label">BEARING</label>
+    </div>
     <div class="arrow-controls">
       <button class="arrow-btn" onmousedown="startArrow('kurs', 1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▲</button>
       <button class="arrow-btn" onmousedown="startArrow('kurs', -1)" onmouseup="stopArrow()" onmouseleave="stopArrow()">▼</button>
@@ -356,65 +540,222 @@
   </div>
 </div>
 
-<div class="rocket-select-container">
-  <select id="rakieta" class="rocket-select" onchange="checkMissileCompatibility()">
+<!-- UKRYTY SELECT (dla kompatybilności) -->
+<select id="rakieta" class="rocket-select-hidden" onchange="checkMissileCompatibility()">
     <optgroup label="Kh-15 (Cruise Missile)">
-      <option value="Kh15">Kh-15 (1600km, 900km/h) - Cele naziemne/morskie</option>
-      <option value="Kh15N">Kh-15N (1600km, 900km/h) - Broń strategiczna</option>
-      <option value="Kh15P">Kh-15P (1600km, 900km/h) - Przeciwradarowa</option>
+      <option value="Kh15">Kh-15</option>
+      <option value="Kh15N">Kh-15N</option>
+      <option value="Kh15P">Kh-15P</option>
     </optgroup>
-
     <optgroup label="Kh-22 (Cruise Missile)">
-      <option value="Kh22">Kh-22 (2500km, 1200km/h) - Cele strategiczne/flota</option>
-      <option value="Kh22N">Kh-22N (2500km, 1200km/h) - Broń strategiczna</option>
+      <option value="Kh22">Kh-22</option>
+      <option value="Kh22N">Kh-22N</option>
     </optgroup>
-
     <optgroup label="A-100 (Tactical Missile)">
-      <option value="A100">A-100 (400km, 4000km/h) - Obrona przeciwlotnicza</option>
-      <option value="A100N">A-100N (400km, 4000km/h) - Szybkie uderzenia nuklearne</option>
+      <option value="A100">A-100</option>
+      <option value="A100N">A-100N</option>
     </optgroup>
-
     <optgroup label="R-9 Sprint (AA Defence)">
-      <option value="R9">R-9 Sprint (200km, 5000km/h) - Obrona punktowa</option>
+      <option value="R9">R-9 Sprint</option>
     </optgroup>
-
     <optgroup label="R-3 (Ballistic Missile)">
-      <option value="R3">R-3 (2000km, 8280km/h) - Ataki balistyczne</option>
-      <option value="R3N">R-3N (2000km, 8280km/h) - Uderzenia strategiczne</option>
+      <option value="R3">R-3</option>
+      <option value="R3N">R-3N</option>
     </optgroup>
-
     <optgroup label="R-5 Zenith (Air-to-Air)">
-      <option value="R5">R-5 Zenith (30km, 2000km/h) - Walka powietrzna WVR</option>
+      <option value="R5">R-5 Zenith</option>
     </optgroup>
-
     <optgroup label="K-13 AAM (Air-to-Air)">
-      <option value="K13">K-13 (30km, 2000km/h) - Walka powietrzna</option>
+      <option value="K13">K-13</option>
     </optgroup>
-
     <optgroup label="S-13 NURS (Unguided)">
-      <option value="S13">S-13 (20km, 1500km/h) - Ataki naziemne</option>
+      <option value="S13">S-13</option>
     </optgroup>
-
     <optgroup label="FAB Bombs">
-      <option value="FAB100">FAB-100 (5km, sw. spadek) - Naloty bombowe</option>
-      <option value="FAB250">FAB-250 (5km, sw. spadek) - Naloty bombowe</option>
+      <option value="FAB100">FAB-100</option>
+      <option value="FAB250">FAB-250</option>
     </optgroup>
-  </select>
+</select>
+
+<!-- CUSTOM MISSILE MENU -->
+<div class="missile-menu">
+  <div class="missile-group">
+    <div class="missile-group-header">Kh-15 (Cruise Missile)</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="Kh15">
+        <div class="missile-header">
+          <span class="missile-name">Kh-15</span>
+          <span class="missile-stats">1600km|900km/h</span>
+        </div>
+        <div class="missile-purpose">naziemne/morskie</div>
+      </div>
+      <div class="missile-item" data-key="Kh15N">
+        <div class="missile-header">
+          <span class="missile-name">Kh-15N</span>
+          <span class="missile-stats">1600km|900km/h</span>
+        </div>
+        <div class="missile-purpose">Broń strategiczna</div>
+      </div>
+      <div class="missile-item" data-key="Kh15P">
+        <div class="missile-header">
+          <span class="missile-name">Kh-15P</span>
+          <span class="missile-stats">1600km|900km/h</span>
+        </div>
+        <div class="missile-purpose">Przeciwradarowa</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="missile-group">
+    <div class="missile-group-header">Kh-22 (Cruise Missile)</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="Kh22">
+        <div class="missile-header">
+          <span class="missile-name">Kh-22</span>
+          <span class="missile-stats">2500km|1200km/h</span>
+        </div>
+        <div class="missile-purpose">strategiczne/flota</div>
+      </div>
+      <div class="missile-item" data-key="Kh22N">
+        <div class="missile-header">
+          <span class="missile-name">Kh-22N</span>
+          <span class="missile-stats">2500km|1200km/h</span>
+        </div>
+        <div class="missile-purpose">Broń strategiczna</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="missile-group">
+    <div class="missile-group-header">A-100 (Tactical Missile)</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="A100">
+        <div class="missile-header">
+          <span class="missile-name">A-100</span>
+          <span class="missile-stats">400km|4000km/h</span>
+        </div>
+        <div class="missile-purpose">Przeciwlotnicze</div>
+      </div>
+      <div class="missile-item" data-key="A100N">
+        <div class="missile-header">
+          <span class="missile-name">A-100N</span>
+          <span class="missile-stats">400km|4000km/h</span>
+        </div>
+        <div class="missile-purpose">Uderzenia nuklearne</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="missile-group">
+    <div class="missile-group-header">R-9 Sprint (AA Defence)</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="R9">
+        <div class="missile-header">
+          <span class="missile-name">R-9</span>
+          <span class="missile-stats">200km|5000km/h</span>
+        </div>
+        <div class="missile-purpose">Obrona punktowa</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="missile-group">
+    <div class="missile-group-header">R-3 (Ballistic Missile)</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="R3">
+        <div class="missile-header">
+          <span class="missile-name">R-3</span>
+          <span class="missile-stats">2000km|8280km/h</span>
+        </div>
+        <div class="missile-purpose">Ataki balistyczne</div>
+      </div>
+      <div class="missile-item" data-key="R3N">
+        <div class="missile-header">
+          <span class="missile-name">R-3N</span>
+          <span class="missile-stats">2000km|8280km/h</span>
+        </div>
+        <div class="missile-purpose">Uderzenia strategiczne</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="missile-group">
+    <div class="missile-group-header">R-5 Zenith (Air-to-Air)</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="R5">
+        <div class="missile-header">
+          <span class="missile-name">R-5</span>
+          <span class="missile-stats">30km|2000km/h</span>
+        </div>
+        <div class="missile-purpose">Walka powietrzna WVR</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="missile-group">
+    <div class="missile-group-header">K-13 AAM (Air-to-Air)</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="K13">
+        <div class="missile-header">
+          <span class="missile-name">K-13</span>
+          <span class="missile-stats">30km|2000km/h</span>
+        </div>
+        <div class="missile-purpose">Walka powietrzna</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="missile-group">
+    <div class="missile-group-header">S-13 NURS (Unguided)</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="S13">
+        <div class="missile-header">
+          <span class="missile-name">S-13</span>
+          <span class="missile-stats">20km|1500km/h</span>
+        </div>
+        <div class="missile-purpose">Ataki naziemne</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="missile-group">
+    <div class="missile-group-header">FAB Bombs</div>
+    <div class="missile-grid">
+      <div class="missile-item" data-key="FAB100">
+        <div class="missile-header">
+          <span class="missile-name">FAB-100</span>
+          <span class="missile-stats">5km|sw. spadek</span>
+        </div>
+        <div class="missile-purpose">Naloty bombowe</div>
+      </div>
+      <div class="missile-item" data-key="FAB250">
+        <div class="missile-header">
+          <span class="missile-name">FAB-250</span>
+          <span class="missile-stats">5km|sw. spadek</span>
+        </div>
+        <div class="missile-purpose">Naloty bombowe</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="missile-tooltip" id="missileTooltip">
   <div class="tooltip-title" id="tooltipName">KH-15 CRUISE MISSILE</div>
   <div class="tooltip-item">
     <span class="tooltip-label">Naprowadzanie:</span>
-    <span class="tooltip-value" id="tooltipGuidance">Pośrednie naprowadzanie</span>
+    <span class="tooltip-value" id="tooltipGuidance">WAYPOINT GUIDANCE | Pośrednie naprowadzanie</span>
   </div>
   <div class="tooltip-item">
     <span class="tooltip-label">Zapalnik:</span>
-    <span class="tooltip-value" id="tooltipFuse">Zapalnik zbliżeniowy</span>
+    <span class="tooltip-value" id="tooltipFuse">PROXIMITY FUSE | Zapalnik zbliżeniowy</span>
   </div>
   <div class="tooltip-item">
     <span class="tooltip-label">Głowica:</span>
-    <span class="tooltip-value" id="tooltipWarhead">Burząca / Jądrowa</span>
+    <span class="tooltip-value" id="tooltipWarhead">HIGH-EXPLOSIVE | Burząca</span>
+  </div>
+  <div class="tooltip-item">
+    <span class="tooltip-label">Prędkość:</span>
+    <span class="tooltip-value" id="tooltipSpeed">900 km/h</span>
   </div>
   <div class="tooltip-item">
     <span class="tooltip-label">Uzbrojenie:</span>
@@ -427,23 +768,23 @@
 </div>
 
 <div class="targeting-panel" id="wynik">
-  <div class="target-line" onmouseover="showResultTooltip('markerTooltip', event)" onmouseout="hideResultTooltip('markerTooltip')">
-    <span class="target-label">MARKER COORDS:</span>
+  <div class="target-line">
+    <span class="target-label" onmouseover="showResultTooltip('markerTooltip', event)" onmouseout="hideResultTooltip('markerTooltip')">MARKER COORDS:</span>
     <span class="target-value" id="marker">---, --- km</span>
     <div class="result-tooltip" id="markerTooltip">Współrzędne punktu, w który należy wycelować rakietę.<br>Rakieta poleci w to miejsce i po uzbrojeniu zacznie szukać celu.</div>
   </div>
-  <div class="target-line" onmouseover="showResultTooltip('distanceTooltip', event)" onmouseout="hideResultTooltip('distanceTooltip')">
-    <span class="target-label">DISTANCE:</span>
+  <div class="target-line">
+    <span class="target-label" onmouseover="showResultTooltip('distanceTooltip', event)" onmouseout="hideResultTooltip('distanceTooltip')">DISTANCE:</span>
     <span class="target-value" id="distance">--- km</span>
     <div class="result-tooltip" id="distanceTooltip">Odległość od twojej pozycji do punktu celowania.<br>Musi być mniejsza niż maksymalny zasięg rakiety.</div>
   </div>
-  <div class="target-line" onmouseover="showResultTooltip('bearingTooltip', event)" onmouseout="hideResultTooltip('bearingTooltip')">
-    <span class="target-label">BEARING:</span>
+  <div class="target-line">
+    <span class="target-label" onmouseover="showResultTooltip('bearingTooltip', event)" onmouseout="hideResultTooltip('bearingTooltip')">BEARING:</span>
     <span class="target-value" id="bearing">---°</span>
     <div class="result-tooltip" id="bearingTooltip">Kierunek w stopniach (0-360°), w którym należy wystrzelić rakietę.<br>0° = północ, 90° = wschód, 180° = południe, 270° = zachód.</div>
   </div>
-  <div class="target-line" onmouseover="showResultTooltip('optimalTooltip', event)" onmouseout="hideResultTooltip('optimalTooltip')">
-    <span class="target-label">OPTIMAL RANGE:</span>
+  <div class="target-line">
+    <span class="target-label" onmouseover="showResultTooltip('optimalTooltip', event)" onmouseout="hideResultTooltip('optimalTooltip')">OPTIMAL RANGE:</span>
     <span class="target-value" id="optimal">--- km</span>
     <div class="result-tooltip" id="optimalTooltip">Optymalny zasięg rakiety uwzględniający odległość uzbrajania.<br>Dla rakiet radarowych: odległość uzbrajania + 50 km zapasu.</div>
   </div>
@@ -467,10 +808,25 @@
   
   <div class="key" onclick="press('0')">0</div>
   <div class="key key-clear" onclick="clearField()">CLEAR</div>
-  <div class="key key-compute" onclick="calculateTarget()">COMPUTE FIRING SOLUTION</div>
+  <div class="key key-clear" onclick="clearAllFields()">CLEAR ALL</div>
 </div>
 
-<div class="footer">HF-INTERCEPT COMPUTER v2.0</div>
+<!-- NOWY SZEROKI PRZYCISK -->
+<div class="key-wide" onclick="calculateTarget()">
+  COMPUTE FIRING SOLUTION
+</div>
+
+<!-- MAPA WSPÓŁRZĘDNYCH - NA SAMYM DOLE -->
+<div class="map-container">
+  <canvas id="coordMap" width="380" height="253"></canvas>
+  <div class="map-labels">
+    <div class="map-label-left">X:0 Y:0</div>
+    <div class="map-label-center">INTERCEPT MAP</div>
+    <div class="map-label-right">X:3000 Y:2000</div>
+  </div>
+</div>
+
+<div class="footer">HF-INTERCEPT COMPUTER v2.1</div>
 
 <script>
 // ========== KONFIGURACJA RAKIET ==========
@@ -687,25 +1043,136 @@ const missiles = {
   }
 };
 
-// ========== OBSŁUGA MENU RAKIET ==========
-const rocketSelect = document.getElementById("rakieta");
-let missileTooltipTimer = null;
-let lastMissileKey = null;
+// ========== MAPA WSPÓŁRZĘDNYCH ==========
+const canvas = document.getElementById('coordMap');
+const ctx = canvas.getContext('2d');
 
-rocketSelect.addEventListener("mousemove", function(event) {
-  if (rocketSelect.size <= 1) return;
+function drawMap() {
+  const width = canvas.width;
+  const height = canvas.height;
   
-  const options = rocketSelect.options;
-  const rect = rocketSelect.getBoundingClientRect();
+  ctx.clearRect(0, 0, width, height);
+  ctx.fillStyle = '#0a0a0a';
+  ctx.fillRect(0, 0, width, height);
   
-  const optionIndex = Math.floor((event.clientY - rect.top) / 20);
-  const option = options[optionIndex];
+  // Siatka
+  ctx.strokeStyle = '#333333';
+  ctx.lineWidth = 0.5;
   
-  if (option && option.value) {
-    const missileKey = option.value;
+  for (let x = 0; x <= 3000; x += 500) {
+    const px = (x / 3000) * width;
+    ctx.beginPath();
+    ctx.moveTo(px, 0);
+    ctx.lineTo(px, height);
+    ctx.stroke();
+  }
+  
+  for (let y = 0; y <= 2000; y += 500) {
+    const py = (y / 2000) * height;
+    ctx.beginPath();
+    ctx.moveTo(0, py);
+    ctx.lineTo(width, py);
+    ctx.stroke();
+  }
+  
+  const sx = +document.getElementById("sx").value || 0;
+  const sy = +document.getElementById("sy").value || 0;
+  const tx = +document.getElementById("tx").value || 0;
+  const ty = +document.getElementById("ty").value || 0;
+  const markerText = document.getElementById("marker").textContent;
+  
+  function gameToPixel(x, y) {
+    const px = (x / 3000) * width;
+    const py = (y / 2000) * height;
+    return { x: px, y: py };
+  }
+  
+  // Nasza pozycja (zielona) - KROPKA 60% MNIEJSZA
+  if (sx > 0 || sy > 0) {
+    const ourPos = gameToPixel(sx, sy);
+    ctx.fillStyle = '#00ff00';
+    ctx.beginPath();
+    ctx.arc(ourPos.x, ourPos.y, 3.6, 0, Math.PI * 2); // 6 * 0.6 = 3.6
+    ctx.fill();
     
-    if (missileKey !== lastMissileKey) {
-      lastMissileKey = missileKey;
+    ctx.fillStyle = '#00ff00';
+    ctx.font = '9px monospace';
+    ctx.fillText('US', ourPos.x + 6, ourPos.y - 6);
+  }
+  
+  // Cel (czerwona) - KROPKA 60% MNIEJSZA
+  if (tx > 0 || ty > 0) {
+    const targetPos = gameToPixel(tx, ty);
+    ctx.fillStyle = '#ff0000';
+    ctx.beginPath();
+    ctx.arc(targetPos.x, targetPos.y, 3.6, 0, Math.PI * 2); // 6 * 0.6 = 3.6
+    ctx.fill();
+    
+    ctx.fillStyle = '#ff0000';
+    ctx.font = '9px monospace';
+    ctx.fillText('TGT', targetPos.x + 6, targetPos.y - 6);
+  }
+  
+  // Marker (pomarańczowa) - KROPKA 60% MNIEJSZA
+  if (markerText !== "---, --- km") {
+    const parts = markerText.split(",");
+    if (parts.length === 2) {
+      const mx = parseInt(parts[0].trim());
+      const my = parseInt(parts[1].replace("km", "").trim());
+      
+      if (!isNaN(mx) && !isNaN(my)) {
+        const markerPos = gameToPixel(mx, my);
+        ctx.fillStyle = '#ffaa00';
+        ctx.beginPath();
+        ctx.arc(markerPos.x, markerPos.y, 3.6, 0, Math.PI * 2); // 6 * 0.6 = 3.6
+        ctx.fill();
+        
+        ctx.fillStyle = '#ffaa00';
+        ctx.font = '9px monospace';
+        ctx.fillText('MARK', markerPos.x + 6, markerPos.y - 6);
+      }
+    }
+  }
+  
+  // Legenda
+  ctx.fillStyle = '#cccccc';
+  ctx.font = '8px monospace';
+  ctx.fillText('GREEN: OUR POSITION', 8, 12);
+  ctx.fillStyle = '#ff0000';
+  ctx.fillText('RED: TARGET', 8, 24);
+  ctx.fillStyle = '#ffaa00';
+  ctx.fillText('ORANGE: INTERCEPT POINT', 8, 36);
+}
+
+// ========== OBSŁUGA CUSTOM MISSILE MENU ==========
+let missileTooltipTimer = null;
+let selectedMissileKey = null;
+
+function selectMissile(key) {
+  const missileItems = document.querySelectorAll(".missile-item");
+  const rocketSelect = document.getElementById("rakieta");
+  
+  missileItems.forEach(item => {
+    item.classList.remove("active");
+  });
+  
+  const selectedItem = document.querySelector(`.missile-item[data-key="${key}"]`);
+  if (selectedItem) {
+    selectedItem.classList.add("active");
+  }
+  
+  rocketSelect.value = key;
+  selectedMissileKey = key;
+  checkMissileCompatibility();
+  saveToLocalStorage();
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  const missileItems = document.querySelectorAll(".missile-item");
+  
+  missileItems.forEach(item => {
+    item.addEventListener("mouseover", function(event) {
+      const missileKey = this.dataset.key;
       
       if (missileTooltipTimer) clearTimeout(missileTooltipTimer);
       
@@ -713,45 +1180,160 @@ rocketSelect.addEventListener("mousemove", function(event) {
         const missile = missiles[missileKey];
         if (missile) {
           document.getElementById("tooltipName").textContent = missile.name;
-document.getElementById("tooltipGuidance").textContent = missile.guidanceEN + " | " + missile.guidance;
-document.getElementById("tooltipFuse").textContent = missile.fuseEN + " | " + missile.fuse;
-document.getElementById("tooltipWarhead").textContent = missile.warheadEN + " | " + missile.warhead;
-document.getElementById("tooltipArming").textContent = missile.armingText;
-document.getElementById("tooltipContext").textContent = missile.context;
+          document.getElementById("tooltipGuidance").textContent = missile.guidanceEN + " | " + missile.guidance;
+          document.getElementById("tooltipFuse").textContent = missile.fuseEN + " | " + missile.fuse;
+          document.getElementById("tooltipWarhead").textContent = missile.warheadEN + " | " + missile.warhead;
+          document.getElementById("tooltipSpeed").textContent = missile.speed + " km/h";
+          document.getElementById("tooltipArming").textContent = missile.armingText;
+          document.getElementById("tooltipContext").textContent = missile.context;
           
           const tooltip = document.getElementById("missileTooltip");
           tooltip.style.left = (event.clientX + 10) + "px";
           tooltip.style.top = (event.clientY + 10) + "px";
           tooltip.classList.add("show");
         }
-      }, 500);
+      }, 200);
+    });
+    
+    item.addEventListener("mouseout", function() {
+      if (missileTooltipTimer) {
+        clearTimeout(missileTooltipTimer);
+        missileTooltipTimer = null;
+      }
+      document.getElementById("missileTooltip").classList.remove("show");
+    });
+    
+    item.addEventListener("click", function() {
+      const missileKey = this.dataset.key;
+      selectMissile(missileKey);
+    });
+  });
+  
+  if (missileItems.length > 0) {
+    selectMissile(missileItems[0].dataset.key);
+  }
+  
+  loadFromLocalStorage();
+  drawMap();
+});
+
+// ========== WALIDACJA WSPÓŁRZĘDNYCH (0-3000 X, 0-2000 Y) ==========
+function validateCoordinates(input) {
+  input.value = input.value.replace(/\D/g, '');
+  
+  if (input.value.length > 4) {
+    input.value = input.value.slice(0, 4);
+  }
+  
+  let val = parseInt(input.value) || 0;
+  
+  if (input.id === "sx" || input.id === "tx") {
+    if (val > 3000) input.value = "3000";
+    if (val < 0) input.value = "0";
+  }
+  
+  if (input.id === "sy" || input.id === "ty") {
+    if (val > 2000) input.value = "2000";
+    if (val < 0) input.value = "0";
+  }
+  
+  checkMissileCompatibility();
+  saveToLocalStorage();
+  drawMap();
+}
+
+// ========== OGRANICZENIE LICZBY CYFR (dla vt i kurs) ==========
+function limitDigits(input, maxDigits) {
+  input.value = input.value.replace(/\D/g, '');
+  
+  if (input.value.length > maxDigits) {
+    input.value = input.value.slice(0, maxDigits);
+  }
+  
+  if (input.id === "kurs") {
+    let val = parseInt(input.value) || 0;
+    if (val > 360) input.value = "360";
+    if (val < 0) input.value = "0";
+  }
+  
+  checkMissileCompatibility();
+  saveToLocalStorage();
+}
+
+// ========== OBSŁUGA KLAWIATURY W POLACH ==========
+function handleKeyInput(event, fieldId) {
+  if (event.key === "Escape") {
+    event.preventDefault();
+    if (activeField) {
+      activeField.value = "";
+      activeField.classList.remove("active");
+      activeField = null;
+    }
+    checkMissileCompatibility();
+    saveToLocalStorage();
+    drawMap();
+    return;
+  }
+  
+  if (event.key === "+" || (event.shiftKey && event.key === "=")) {
+    event.preventDefault();
+    adjustFieldOnce(fieldId, (fieldId === "vt") ? 10 : 1);
+  }
+  
+  if (event.key === "-" || event.key === "_") {
+    event.preventDefault();
+    adjustFieldOnce(fieldId, (fieldId === "vt") ? -10 : -1);
+  }
+  
+  if (event.key === "ArrowUp") {
+    event.preventDefault();
+    adjustFieldOnce(fieldId, (fieldId === "vt") ? 10 : 1);
+  }
+  if (event.key === "ArrowDown") {
+    event.preventDefault();
+    adjustFieldOnce(fieldId, (fieldId === "vt") ? -10 : -1);
+  }
+  
+  if (event.key === "Enter") {
+    event.preventDefault();
+    const fields = ["sx", "sy", "tx", "ty", "vt", "kurs"];
+    const currentIndex = fields.indexOf(fieldId);
+    if (currentIndex < fields.length - 1) {
+      document.getElementById(fields[currentIndex + 1]).focus();
     }
   }
-});
-
-rocketSelect.addEventListener("mouseleave", function() {
-  if (missileTooltipTimer) {
-    clearTimeout(missileTooltipTimer);
-    missileTooltipTimer = null;
+  
+  const allowedKeys = [
+    "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+    "Backspace", "Delete", "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
+    "Tab", "Enter", "+", "-", "=", "_", "Escape"
+  ];
+  
+  if (!allowedKeys.includes(event.key) && 
+      !(event.ctrlKey || event.metaKey) &&
+      !(event.key === "a" && event.ctrlKey) &&
+      !(event.key === "c" && event.ctrlKey) &&
+      !(event.key === "v" && event.ctrlKey) &&
+      !(event.key === "x" && event.ctrlKey)) {
+    event.preventDefault();
   }
-  lastMissileKey = null;
-  document.getElementById("missileTooltip").classList.remove("show");
-});
+}
 
-rocketSelect.addEventListener("click", function() {
-  if (rocketSelect.size <= 1) {
-    rocketSelect.size = rocketSelect.options.length;
-  } else {
-    rocketSelect.size = 1;
-    document.getElementById("missileTooltip").classList.remove("show");
-  }
-});
-
-document.addEventListener("click", function(event) {
-  if (event.target !== rocketSelect) {
-    rocketSelect.size = 1;
-    document.getElementById("missileTooltip").classList.remove("show");
-  }
+document.querySelectorAll(".input-field").forEach(field => {
+  field.addEventListener("focus", function() {
+    if (activeField) activeField.classList.remove("active");
+    activeField = this;
+    this.classList.add("active");
+    this.select();
+  });
+  
+  field.addEventListener("input", function() {
+    checkMissileCompatibility();
+    saveToLocalStorage();
+    if (this.id === "sx" || this.id === "sy" || this.id === "tx" || this.id === "ty") {
+      drawMap();
+    }
+  });
 });
 
 // ========== TOOLTIPY DLA WYNIKÓW ==========
@@ -767,7 +1349,7 @@ function showResultTooltip(tooltipId, event) {
     tooltip.style.left = (event.clientX + 15) + "px";
     tooltip.style.top = (event.clientY + 15) + "px";
     tooltip.classList.add("show");
-  }, 500);
+  }, 200);
 }
 
 function hideResultTooltip(tooltipId) {
@@ -793,8 +1375,18 @@ function adjustFieldOnce(fieldId, delta) {
   const field = document.getElementById(fieldId);
   if (!field) return;
   
-  let val = parseFloat(field.value) || 0;
+  let val = parseInt(field.value) || 0;
   val += delta;
+  
+  if ((fieldId === "sx" || fieldId === "tx")) {
+    if (val < 0) val = 0;
+    if (val > 3000) val = 3000;
+  }
+  
+  if ((fieldId === "sy" || fieldId === "ty")) {
+    if (val < 0) val = 0;
+    if (val > 2000) val = 2000;
+  }
   
   if (fieldId === "kurs") {
     if (val < 0) val = 360;
@@ -803,13 +1395,17 @@ function adjustFieldOnce(fieldId, delta) {
   
   if (fieldId === "vt" && val < 0) val = 0;
   
-  field.value = val.toFixed(fieldId === "vt" ? 0 : 1);
+  field.value = Math.round(val);
   
   if (activeField) activeField.classList.remove("active");
   activeField = field;
   field.classList.add("active");
   
   checkMissileCompatibility();
+  saveToLocalStorage();
+  if (fieldId === "sx" || fieldId === "sy" || fieldId === "tx" || fieldId === "ty") {
+    drawMap();
+  }
 }
 
 function stopArrow() {
@@ -820,35 +1416,107 @@ function stopArrow() {
   }
 }
 
-// ========== INICJALIZACJA ==========
-window.addEventListener("DOMContentLoaded", () => {
-  checkMissileCompatibility();
-});
-
 // ========== ZMIENNE INTERFEJSU ==========
 let activeField = null;
 
-document.querySelectorAll(".input-field").forEach(field => {
-  field.addEventListener("click", function() {
-    if (activeField) activeField.classList.remove("active");
-    activeField = this;
-    this.classList.add("active");
-  });
-  
-  field.addEventListener("input", checkMissileCompatibility);
-});
-
-// ========== FUNKCJE KLAWIATURY ==========
+// ========== FUNKCJE KLAWIATURY NUMERYCZNEJ ==========
 function press(val) {
   if (!activeField) return;
   activeField.value += val;
+  
+  if (activeField.id === "sx" || activeField.id === "sy" || 
+      activeField.id === "tx" || activeField.id === "ty") {
+    validateCoordinates(activeField);
+  } else if (activeField.id === "kurs") {
+    limitDigits(activeField, 3);
+  } else if (activeField.id === "vt") {
+    limitDigits(activeField, 4);
+  }
+  
   checkMissileCompatibility();
+  saveToLocalStorage();
 }
 
+// ========== CLEAR FIELD (czyści tylko aktywne pole) ==========
 function clearField() {
   if (!activeField) return;
   activeField.value = "";
   checkMissileCompatibility();
+  saveToLocalStorage();
+  drawMap();
+}
+
+// ========== CLEAR ALL FIELDS (czyści wszystkie pola) ==========
+function clearAllFields() {
+  const fields = ["sx", "sy", "tx", "ty", "vt", "kurs"];
+  fields.forEach(id => {
+    const field = document.getElementById(id);
+    if (field) {
+      field.value = "";
+    }
+  });
+  
+  if (activeField) {
+    activeField.classList.remove("active");
+    activeField = null;
+  }
+  
+  document.getElementById("marker").textContent = "---, --- km";
+  document.getElementById("distance").textContent = "--- km";
+  document.getElementById("bearing").textContent = "---°";
+  document.getElementById("optimal").textContent = "--- km";
+  
+  updateStatus("WPISZ DANE CELU", "neutral");
+  saveToLocalStorage();
+  drawMap();
+}
+
+// ========== LOCALSTORAGE ==========
+function saveToLocalStorage() {
+  const data = {
+    sx: document.getElementById("sx").value,
+    sy: document.getElementById("sy").value,
+    tx: document.getElementById("tx").value,
+    ty: document.getElementById("ty").value,
+    vt: document.getElementById("vt").value,
+    kurs: document.getElementById("kurs").value,
+    missile: document.getElementById("rakieta").value,
+    timestamp: new Date().getTime()
+  };
+  
+  try {
+    localStorage.setItem("hf_intercept_data", JSON.stringify(data));
+  } catch (e) {
+    console.log("Błąd zapisu do localStorage:", e);
+  }
+}
+
+function loadFromLocalStorage() {
+  try {
+    const saved = localStorage.getItem("hf_intercept_data");
+    if (!saved) return;
+    
+    const data = JSON.parse(saved);
+    
+    if (data.sx) document.getElementById("sx").value = data.sx;
+    if (data.sy) document.getElementById("sy").value = data.sy;
+    if (data.tx) document.getElementById("tx").value = data.tx;
+    if (data.ty) document.getElementById("ty").value = data.ty;
+    if (data.vt) document.getElementById("vt").value = data.vt;
+    if (data.kurs) document.getElementById("kurs").value = data.kurs;
+    
+    if (data.missile && missiles[data.missile]) {
+      selectMissile(data.missile);
+    }
+    
+    setTimeout(() => {
+      checkMissileCompatibility();
+      drawMap();
+    }, 100);
+    
+  } catch (e) {
+    console.log("Błąd odczytu z localStorage:", e);
+  }
 }
 
 // ========== SPRAWDZANIE ZGODNOŚCI RAKIETY ==========
@@ -924,81 +1592,92 @@ function calculateTarget() {
   const Ty = +document.getElementById("ty").value || 0;
   const vT = +document.getElementById("vt").value || 0;
   const kursDeg = +document.getElementById("kurs").value || 0;
-  
+
   const missileKey = document.getElementById("rakieta").value;
   if (!missiles[missileKey]) {
     updateStatus("❌ WYBIERZ RAKIETĘ", "error");
     return;
   }
-  
+
   const missile = missiles[missileKey];
+
+  // --- KONWERSJA BEARINGU HIGHFLEET ---
   const kursRad = kursDeg * Math.PI / 180;
-  const vx = vT * Math.cos(kursRad);
-  const vy = vT * Math.sin(kursRad);
+  const vx = vT * Math.sin(kursRad);
+  const vy = -vT * Math.cos(kursRad);
+
+  // --- WEKTOR OD CIEBIE DO CELU ---
   const rx = Tx - Sx;
   const ry = Ty - Sy;
-  
+
+  // --- RÓWNANIE PRZECHWYTU ---
   const a = vx * vx + vy * vy - missile.speed * missile.speed;
   const b = 2 * (rx * vx + ry * vy);
   const c = rx * rx + ry * ry;
-  
+
   const d = b * b - 4 * a * c;
-  
   if (d < 0) {
     updateStatus("❌ BRAK ROZWIĄZANIA", "error");
     return;
   }
-  
+
   const sqrtD = Math.sqrt(d);
   const t1 = (-b - sqrtD) / (2 * a);
   const t2 = (-b + sqrtD) / (2 * a);
   const ts = [t1, t2].filter(t => t >= 0);
-  
+
   if (ts.length === 0) {
     updateStatus("❌ BRAK CZASU SPOTKANIA", "error");
     return;
   }
-  
+
   const t = Math.min(...ts);
+
+  // --- PUNKT SPOTKANIA (INTERCEPT) ---
   const Px = Tx + vx * t;
   const Py = Ty + vy * t;
+
   const distToImpact = Math.hypot(Px - Sx, Py - Sy);
-  
   if (distToImpact > missile.range) {
     updateStatus(`❌ POZA ZASIĘGIEM (${distToImpact.toFixed(0)} > ${missile.range})`, "error");
     return;
   }
-  
-  let markerX, markerY, markerDist, bearing;
-  
+
+  // --- ZAWSZE POKAZUJ PUNKT SPOTKANIA ---
+  const markerX = Px;
+  const markerY = Py;
+  const markerDist = distToImpact;
+
+  // Sprawdź czy rakieta ma czas się uzbroić
   if (missile.arming > 0) {
-    const bearingToTarget = Math.atan2(Py - Sy, Px - Sx);
-    markerX = Px - missile.arming * Math.cos(bearingToTarget);
-    markerY = Py - missile.arming * Math.sin(bearingToTarget);
-    markerDist = Math.hypot(markerX - Sx, markerY - Sy);
-    bearing = Math.atan2(markerY - Sy, markerX - Sx);
-  } else {
-    markerX = Px;
-    markerY = Py;
-    markerDist = distToImpact;
-    bearing = Math.atan2(Py - Sy, Px - Sx);
+    const distToArming = Math.max(0, markerDist - missile.arming);
+    if (distToArming < 50) { // Zapas 50 km
+      updateStatus(`⚠️ MAŁY ZAPAS UZBROJENIA`, "warning");
+    }
   }
-  
-  if (missile.arming > 0 && markerDist < missile.arming) {
-    updateStatus(`❌ MIN ODLEGŁOŚĆ: ${missile.arming}KM`, "error");
-    return;
-  }
-  
-  const optimalRange = missile.arming + 50;
-  let bearingDeg = bearing * 180 / Math.PI;
+
+  // --- POPRAWNY BEARING HIGHFLEET ---
+  // wektor od Ciebie do punktu spotkania (Y ODBITE!)
+  const ux = markerX - Sx;
+  const uy = Sy - markerY;  // ODBICIE Y! (bo Y rośnie w dół)
+
+  // kąt matematyczny (0° = wschód, CCW)
+  let alpha = Math.atan2(uy, ux);
+
+  // KONWERSJA MATEMATYCZNA → HIGHFLEET
+  let bearingDeg = (360 - (alpha * 180 / Math.PI) + 90) % 360;
   if (bearingDeg < 0) bearingDeg += 360;
-  
+
+  const optimalRange = missile.arming + 50;
+
   document.getElementById("marker").textContent = `${markerX.toFixed(0)}, ${markerY.toFixed(0)} km`;
   document.getElementById("distance").textContent = `${markerDist.toFixed(0)} km`;
   document.getElementById("bearing").textContent = `${bearingDeg.toFixed(0)}°`;
   document.getElementById("optimal").textContent = `${optimalRange.toFixed(0)} km`;
-  
-  updateStatus(`✓ ${missile.name.split(" ")[0]} ROZWIĄZANIE GOTOWE`, "success");
+
+  updateStatus(`✓ ${missile.name.split(" ")[0]} Parametry wybrane`, "success");
+  saveToLocalStorage();
+  drawMap();
 }
 </script>
 </body>
