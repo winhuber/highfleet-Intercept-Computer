@@ -26,6 +26,7 @@
     --missile-hover: #1a1a1a;
     --missile-active: #2a2a2a;
     --group-header: #333333;
+    --error-red: #ff3333;
   }
 
   body {
@@ -47,6 +48,12 @@
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 2px;
+    transition: all 0.3s;
+  }
+
+  .header.warning {
+    color: var(--error-red);
+    border-bottom-color: var(--error-red);
   }
 
   .header h1 {
@@ -68,12 +75,12 @@
 
   .input-field {
     width: 100%;
-    height: 50px;
+    height: 30px;
     background: var(--field);
     color: var(--accent);
     border: 1px solid var(--border);
     border-radius: 3px;
-    font-size: 20px;
+    font-size: 15px;
     text-align: center;
     font-family: 'Orbitron', monospace;
     padding: 0 4px;
@@ -103,7 +110,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 40px;
+    height: 30px;
   }
 
   .arrow-btn {
@@ -135,7 +142,7 @@
   border-radius: 3px;
   padding: 10px;
   margin: 8px 0;
-  max-height: 140px; /* ZMIENIONE z 200px na 140px (-30%) */
+  max-height: 140px;
   overflow-y: auto;
 }
 
@@ -325,7 +332,7 @@
   }
 
   .key {
-    height: 36px;
+    height: 25px;
     background: var(--field);
     color: var(--accent);
     border: 1px solid var(--border);
@@ -372,7 +379,7 @@
     color: var(--accent);
     border: 1px solid var(--border);
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 15px;
     text-transform: uppercase;
     display: flex;
     align-items: center;
@@ -398,6 +405,12 @@
     margin-top: 10px;
     position: relative;
     overflow: hidden;
+    transition: border-color 0.3s;
+  }
+
+  .map-container.warning {
+    border-color: var(--error-red);
+    border-width: 2px;
   }
 
   #coordMap {
@@ -406,7 +419,70 @@
     display: block;
   }
 
-  .map-labels {
+  /* KOMUNIKAT OSTRZEGAWCZY NA MAPIE */
+  .map-warning {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(255, 50, 50, 0.9);
+    border: 2px solid #ff0000;
+    border-radius: 5px;
+    padding: 10px 15px;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-align: center;
+    z-index: 10;
+    display: none;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+    pointer-events: none;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 1px;
+  }
+
+  .map-warning.show {
+    display: block;
+    animation: pulse 1s infinite alternate;
+  }
+
+  @keyframes pulse {
+    from { box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); }
+    to { box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); }
+  }
+
+  /* NAPISY NA GÓRZE MAPY */
+  .map-labels-top {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+    font-size: 14px;
+    pointer-events: none;
+  }
+
+  .map-label-left-top {
+    text-align: left;
+    color: #00ff00; /* Zielony dla OUR POSITION */
+  }
+
+  .map-label-center-top {
+    text-align: center;
+    flex-grow: 1;
+    color: #ff0000; /* Czerwony dla TARGET */
+  }
+
+  .map-label-right-top {
+    text-align: right;
+    color: #ffaa00; /* Pomarańczowy dla INTERCEPT POINT */
+  }
+
+  /* NAPISY NA DOLE MAPY (istniejące) */
+  .map-labels-bottom {
     position: absolute;
     bottom: 5px;
     left: 0;
@@ -414,7 +490,7 @@
     display: flex;
     justify-content: space-between;
     padding: 0 10px;
-    font-size: 11px;
+    font-size: 14px;
     color: var(--text-dim);
     pointer-events: none;
   }
@@ -433,7 +509,7 @@
   }
 
   .footer {
-    font-size: 14px;
+    font-size: 16px;
     color: var(--text-dim);
     text-align: center;
     margin-top: 8px;
@@ -450,7 +526,7 @@
   position: absolute;
   top: 8px;
   left: 8px;
-  font-size: 15px;
+  font-size: 14px;
   color: var(--placeholder);
   pointer-events: none;
   transition: all 0.2s;
@@ -461,14 +537,14 @@
 .input-field:focus + .input-label,
 .input-field:not(:placeholder-shown) + .input-label {
   top: 2px;
-  font-size: 12px;
+  font-size: 9px;
   color: var(--accent);
 }
 </style>
 </head>
 <body>
 
-<div class="header">
+<div class="header" id="mainHeader">
   <h1>HF-INTERCEPT COMPUTER</h1>
 </div>
 
@@ -817,9 +893,23 @@
 </div>
 
 <!-- MAPA WSPÓŁRZĘDNYCH - NA SAMYM DOLE -->
-<div class="map-container">
+<div class="map-container" id="mapContainer">
   <canvas id="coordMap" width="380" height="253"></canvas>
-  <div class="map-labels">
+  
+  <!-- KOMUNIKAT OSTRZEGAWCZY NA MAPIE -->
+  <div class="map-warning" id="mapWarning">
+    WARNING: IMPACT OUT OF MAP BOUNDS
+  </div>
+  
+  <!-- NAPISY NA GÓRZE MAPY -->
+  <div class="map-labels-top">
+    <div class="map-label-left-top">OUR POSITION</div>
+    <div class="map-label-center-top">TARGET</div>
+    <div class="map-label-right-top">INTERCEPT POINT</div>
+  </div>
+  
+  <!-- NAPISY NA DOLE MAPY (istniejące) -->
+  <div class="map-labels-bottom">
     <div class="map-label-left">X:0 Y:0</div>
     <div class="map-label-center">INTERCEPT MAP</div>
     <div class="map-label-right">X:3000 Y:2000</div>
@@ -1092,7 +1182,7 @@ function drawMap() {
     const ourPos = gameToPixel(sx, sy);
     ctx.fillStyle = '#00ff00';
     ctx.beginPath();
-    ctx.arc(ourPos.x, ourPos.y, 3.6, 0, Math.PI * 2); // 6 * 0.6 = 3.6
+    ctx.arc(ourPos.x, ourPos.y, 3.6, 0, Math.PI * 2);
     ctx.fill();
     
     ctx.fillStyle = '#00ff00';
@@ -1105,7 +1195,7 @@ function drawMap() {
     const targetPos = gameToPixel(tx, ty);
     ctx.fillStyle = '#ff0000';
     ctx.beginPath();
-    ctx.arc(targetPos.x, targetPos.y, 3.6, 0, Math.PI * 2); // 6 * 0.6 = 3.6
+    ctx.arc(targetPos.x, targetPos.y, 3.6, 0, Math.PI * 2);
     ctx.fill();
     
     ctx.fillStyle = '#ff0000';
@@ -1113,18 +1203,28 @@ function drawMap() {
     ctx.fillText('TGT', targetPos.x + 6, targetPos.y - 6);
   }
   
+  // Sprawdź czy punkt przechwycenia jest poza mapą
+  let markerOutOfBounds = false;
+  let markerX = null;
+  let markerY = null;
+  
   // Marker (pomarańczowa) - KROPKA 60% MNIEJSZA
   if (markerText !== "---, --- km") {
     const parts = markerText.split(",");
     if (parts.length === 2) {
-      const mx = parseInt(parts[0].trim());
-      const my = parseInt(parts[1].replace("km", "").trim());
+      markerX = parseInt(parts[0].trim());
+      markerY = parseInt(parts[1].replace("km", "").trim());
       
-      if (!isNaN(mx) && !isNaN(my)) {
-        const markerPos = gameToPixel(mx, my);
+      if (!isNaN(markerX) && !isNaN(markerY)) {
+        // Sprawdź czy marker jest poza obszarem mapy
+        if (markerX < 0 || markerX > 3000 || markerY < 0 || markerY > 2000) {
+          markerOutOfBounds = true;
+        }
+        
+        const markerPos = gameToPixel(markerX, markerY);
         ctx.fillStyle = '#ffaa00';
         ctx.beginPath();
-        ctx.arc(markerPos.x, markerPos.y, 3.6, 0, Math.PI * 2); // 6 * 0.6 = 3.6
+        ctx.arc(markerPos.x, markerPos.y, 3.6, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.fillStyle = '#ffaa00';
@@ -1134,14 +1234,30 @@ function drawMap() {
     }
   }
   
-  // Legenda
-  ctx.fillStyle = '#cccccc';
-  ctx.font = '8px monospace';
-  ctx.fillText('GREEN: OUR POSITION', 8, 12);
-  ctx.fillStyle = '#ff0000';
-  ctx.fillText('RED: TARGET', 8, 24);
-  ctx.fillStyle = '#ffaa00';
-  ctx.fillText('ORANGE: INTERCEPT POINT', 8, 36);
+  // Aktualizuj stan ostrzeżeń
+  const mapContainer = document.getElementById('mapContainer');
+  const mainHeader = document.getElementById('mainHeader');
+  const mapWarning = document.getElementById('mapWarning');
+  
+  if (markerOutOfBounds) {
+    // Czerwona ramka mapy
+    mapContainer.classList.add('warning');
+    
+    // Czerwony nagłówek z WARNING
+    mainHeader.classList.add('warning');
+    mainHeader.querySelector('h1').textContent = 'IMPACT OUT OF MAP';
+    
+    // POKAŻ KOMUNIKAT NA MAPIE
+    mapWarning.classList.add('show');
+  } else {
+    // Normalny stan
+    mapContainer.classList.remove('warning');
+    mainHeader.classList.remove('warning');
+    mainHeader.querySelector('h1').textContent = 'HF-INTERCEPT COMPUTER';
+    
+    // UKRYJ KOMUNIKAT NA MAPIE
+    mapWarning.classList.remove('show');
+  }
 }
 
 // ========== OBSŁUGA CUSTOM MISSILE MENU ==========
@@ -1651,20 +1767,16 @@ function calculateTarget() {
   // Sprawdź czy rakieta ma czas się uzbroić
   if (missile.arming > 0) {
     const distToArming = Math.max(0, markerDist - missile.arming);
-    if (distToArming < 50) { // Zapas 50 km
+    if (distToArming < 50) {
       updateStatus(`⚠️ MAŁY ZAPAS UZBROJENIA`, "warning");
     }
   }
 
   // --- POPRAWNY BEARING HIGHFLEET ---
-  // wektor od Ciebie do punktu spotkania (Y ODBITE!)
   const ux = markerX - Sx;
-  const uy = Sy - markerY;  // ODBICIE Y! (bo Y rośnie w dół)
+  const uy = Sy - markerY;
 
-  // kąt matematyczny (0° = wschód, CCW)
   let alpha = Math.atan2(uy, ux);
-
-  // KONWERSJA MATEMATYCZNA → HIGHFLEET
   let bearingDeg = (360 - (alpha * 180 / Math.PI) + 90) % 360;
   if (bearingDeg < 0) bearingDeg += 360;
 
