@@ -1,0 +1,626 @@
+/* ========== VARIABLES ========== */
+:root {
+  --bg: #000000;
+  --accent: #ffaa00;
+  --accent-dark: #cc8800;
+  --panel: #0a0a0a;
+  --field: #111111;
+  --border: #ffaa00;
+  --border-active: #ffaa00;
+  --placeholder: #666666;
+  --text-dim: #cfcfcf;
+  --text-light: #cccccc;
+  --warning: #ff5500;
+  --success: #00b600;
+  --arrow: #444444;
+  --tooltip-bg: #1a1a1a;
+  --missile-bg: #111111;
+  --missile-hover: #1a1a1a;
+  --missile-active: #2a2a2a;
+  --group-header: #333333;
+  --error-red: #ff3333;
+  --compatible-green: #00cc00;
+  --incompatible-red: #cc0000;
+}
+
+/* ========== BASE STYLES ========== */
+body {
+  background: var(--bg);
+  color: var(--accent);
+  font-family: 'VCR OSD Mono', monospace;
+  margin: 0;
+  padding: 8px;
+  font-size: 11px;
+  max-width: 240px;
+  margin: 0 auto;
+  overflow-x: hidden;
+}
+
+/* ========== HEADER (NAGŁÓWEK) ========== */
+.header {
+  text-align: left;
+  padding: 6px 0;
+  padding-left: 10px;
+  border-bottom: 1px solid var(--accent);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.3s;
+}
+
+.header.warning {
+  color: var(--error-red);
+  border-bottom-color: var(--error-red);
+}
+
+.header h1 {
+  font-size: 10px;
+  margin: 0;
+  font-weight: normal;
+  text-align: left;
+  line-height: 1.3;
+}
+
+/* ========== INPUT FIELDS (POLA WPROWADZANIA) ========== */
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.input-container {
+  position: relative;
+}
+
+.input-with-label {
+  position: relative;
+}
+
+.input-field {
+  width: 100%;
+  height: 30px;
+  background: var(--field);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 17px;
+  text-align: right;
+  font-family: 'VCR OSD Mono', monospace;
+  padding: 0 4px;
+  box-sizing: border-box;
+  text-transform: uppercase;
+  padding-right: 20px;
+}
+
+.input-field::placeholder {
+  color: var(--placeholder);
+  font-size: 10px;
+}
+
+.input-field:focus {
+  outline: none;
+}
+
+.input-field.active {
+  border: 3px solid var(--border-active);
+  background: #1a1a1a;
+}
+
+/* ========== NOWE LABELE DWULINIOWE ========== */
+.input-label-two-line {
+  position: absolute;
+  top: 3px;
+  left: 5px;
+  font-size: 12px;
+  color: var(--placeholder);
+  pointer-events: none;
+  transition: all 0.2s;
+  font-family: 'VCR OSD Mono', monospace;
+  text-transform: uppercase;
+}
+
+.label-line-1 {
+  margin-bottom: -3px;
+  text-align: left;
+}
+
+.label-line-2 {
+  text-align: center;
+  margin-left: 0px;
+}
+
+.input-label-two-line:has(.label-line-1:only-child) {
+  display: flex;
+  align-items: center;
+  height: 35%;
+}
+
+.input-field:focus ~ .input-label-two-line,
+.input-field:not(:placeholder-shown) ~ .input-label-two-line {
+  top: 2px;
+  font-size: 9px;
+  color: var(--accent);
+}
+
+/* ========== ARROW CONTROLS (STRZAŁKI) ========== */
+.arrow-controls {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 30px;
+  background: transparent !important;
+  border: none !important;
+  padding: 0;
+  margin: 0;
+  width: 15px;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.arrow-btn {
+  width: 15px;
+  height: 15px;
+  background: transparent !important;
+  border: none !important;
+  color: var(--arrow);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  user-select: none;
+  -webkit-user-select: none;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.arrow-btn:hover {
+  color: var(--accent) !important;
+  background: transparent !important;
+  border: none !important;
+}
+
+/* ========== MISSILE SELECTION (WYBÓR RAKIET) ========== */
+.rocket-select-hidden {
+  display: none !important;
+}
+
+.missile-menu {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px;
+  margin: 8px 0;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.missile-menu::-webkit-scrollbar {
+  width: 14px;
+}
+
+.missile-menu::-webkit-scrollbar-track {
+  background: var(--field);
+  border-radius: 4px;
+}
+
+.missile-menu::-webkit-scrollbar-thumb {
+  background: var(--accent-dark);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.missile-menu::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Grupy rakiet */
+.missile-group {
+  margin-bottom: 10px;
+}
+
+.missile-group:last-child {
+  margin-bottom: 0;
+}
+
+.missile-group-header {
+  text-align: center;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px dashed var(--accent-dark);
+  letter-spacing: 0.5px;
+}
+
+.missile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 4px;
+}
+
+.missile-item {
+  background: var(--missile-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 6px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.1s;
+  user-select: none;
+  width: 185px;
+  margin: 0 auto;
+  display: block;
+}
+
+.missile-item:hover {
+  background: var(--missile-hover);
+  border-color: var(--text-light);
+}
+
+.missile-item.active {
+  background: var(--missile-active);
+  border-color: var(--success);
+  border-width: 2px;
+}
+
+/* Obramówki zgodności przy najechaniu */
+.missile-item.compatible-border {
+  border-color: var(--compatible-green);
+  border-width: 2px;
+}
+
+.missile-item.incompatible-border {
+  border-color: var(--incompatible-red);
+  border-width: 2px;
+}
+
+.missile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+}
+
+.missile-name {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: italic;
+  text-transform: uppercase;
+}
+
+.missile-stats {
+  color: var(--text-light);
+  font-size: 11px;
+  margin-left: 10px;
+}
+
+.missile-purpose {
+  color: var(--text-dim);
+  font-size: 11px;
+  margin-top: 2px;
+  font-style: bold;
+  text-transform: uppercase;
+  width: 100%;
+  text-align: center;
+}
+
+/* ========== TARGETING PANEL (OKNO WYNIKÓW) ========== */
+.targeting-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.target-line {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.target-label {
+  color: var(--text-dim);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.target-value {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status-line {
+  color: var(--text-dim);
+  font-size: 12px;
+  text-align: center;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--accent-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.status-valid {
+  color: var(--success) !important;
+}
+
+.status-icon {
+  font-size: 12px;
+}
+
+/* ========== KEYBOARD (KLAWIATURA) ========== */
+.keyboard {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.key {
+  height: 25px;
+  background: var(--field);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: 'VCR OSD Mono', monospace;
+  user-select: none;
+}
+
+.key:active {
+  background: var(--accent);
+  color: #000;
+}
+
+.key-clear {
+  font-size: 15px;
+  text-transform: uppercase;
+}
+
+.key-wide {
+  grid-column: span 3;
+  height: 36px;
+  background: var(--field);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 15px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-family: 'VCR OSD Mono', monospace;
+  user-select: none;
+  margin-top: 10px;
+}
+
+.key-wide:active {
+  background: var(--accent);
+  color: #000;
+}
+
+/* ========== MAP CONTAINER (MAPA) ========== */
+.map-container {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  margin-top: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+  aspect-ratio: 3 / 2;
+  min-height: 150px;
+  max-height: 400px;
+}
+
+.map-container.warning {
+  border-color: var(--error-red);
+  border-width: 2px;
+}
+
+#coordMap {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.map-warning {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 50, 50, 0.9);
+  border: 2px solid #ff0000;
+  border-radius: 5px;
+  padding: 10px 15px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  z-index: 10;
+  display: none;
+  box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
+  pointer-events: none;
+  font-family: 'VCR OSD Mono', monospace;
+  letter-spacing: 1px;
+}
+
+.map-warning.show {
+  display: block;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { box-shadow: 0 0 10px rgba(255, 0, 0, 0.5); }
+  to { box-shadow: 0 0 20px rgba(255, 0, 0, 0.9); }
+}
+
+.map-labels-top {
+  position: absolute;
+  top: 5px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 9px;
+  pointer-events: none;
+}
+
+.map-label-left-top {
+  text-align: left;
+  color: #00ff00;
+}
+
+.map-label-center-top {
+  text-align: center;
+  flex-grow: 1;
+  color: #ff0000;
+}
+
+.map-label-right-top {
+  text-align: right;
+  color: #ffaa00;
+}
+
+.map-labels-bottom {
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 9px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+
+.map-label-left {
+  text-align: left;
+}
+
+.map-label-right {
+  text-align: right;
+}
+
+.map-label-center {
+  text-align: center;
+  flex-grow: 1;
+}
+
+/* ========== ARROW COORDINATES DISPLAY ========== */
+.arrow-coordinates {
+  position: fixed;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-size: 10px;
+  color: var(--accent);
+  font-family: 'VCR OSD Mono', monospace;
+  display: none;
+  z-index: 10000;
+  pointer-events: none;
+}
+
+.coord-line {
+  margin: 2px 0;
+  white-space: nowrap;
+}
+
+/* ========== TOOLTIPS (DYMKI POMOCY) ========== */
+.missile-tooltip {
+  position: fixed;
+  background: var(--tooltip-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px;
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.4;
+  z-index: 1000;
+  display: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  max-width: 300px;
+  pointer-events: none;
+}
+
+.missile-tooltip.show {
+  display: block;
+}
+
+.tooltip-title {
+  color: var(--accent);
+  font-weight: bold;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.tooltip-item {
+  margin-bottom: 3px;
+  display: flex;
+}
+
+.tooltip-label {
+  color: var(--text-dim);
+  min-width: 80px;
+}
+
+.tooltip-value {
+  color: var(--text-light);
+  flex: 1;
+}
+
+.result-tooltip {
+  position: fixed;
+  background: var(--tooltip-bg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 8px;
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.4;
+  z-index: 10000;
+  display: none;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  max-width: 250px;
+  pointer-events: none;
+}
+
+.result-tooltip.show {
+  display: block;
+}
+
+/* ========== FOOTER (STOPKA) ========== */
+.footer {
+  font-size: 16px;
+  color: var(--text-dim);
+  text-align: center;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+}
