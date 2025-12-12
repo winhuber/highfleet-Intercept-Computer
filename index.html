@@ -21,8 +21,8 @@
     <div class="input-with-label">
       <input id="sx" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'sx')" oninput="validateCoordinates(this)">
       <div class="input-label-two-line" data-for="sx">
-        <div class="label-line-1">OUR X</div>
-        <div class="label-line-2"> </div>
+        <div class="label-line-1">OUR</div>
+        <div class="label-line-2">X</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -36,8 +36,8 @@
     <div class="input-with-label">
       <input id="sy" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'sy')" oninput="validateCoordinates(this)">
       <div class="input-label-two-line" data-for="sy">
-        <div class="label-line-1">OUR Y</div>
-        <div class="label-line-2"> </div>
+        <div class="label-line-1">OUR</div>
+        <div class="label-line-2">Y</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -51,8 +51,8 @@
     <div class="input-with-label">
       <input id="tx" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'tx')" oninput="validateCoordinates(this)">
       <div class="input-label-two-line" data-for="tx">
-        <div class="label-line-1">TARGET X</div>
-        <div class="label-line-2"> </div>
+        <div class="label-line-1">TAR.</div>
+        <div class="label-line-2">X</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -66,8 +66,8 @@
     <div class="input-with-label">
       <input id="ty" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'ty')" oninput="validateCoordinates(this)">
       <div class="input-label-two-line" data-for="ty">
-        <div class="label-line-1">TARGET Y</div>
-        <div class="label-line-2"> </div>
+        <div class="label-line-1">TAR.</div>
+        <div class="label-line-2">Y</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -347,14 +347,15 @@
     <span class="target-value" id="bearing">---°</span>
     <div class="result-tooltip" id="bearingTooltip">Kierunek w stopniach (0-360°), w którym należy wystrzelić rakietę.<br>0° = północ, 90° = wschód, 180° = południe, 270° = zachód.</div>
   </div>
+
   <div class="target-line">
-    <span class="target-label" onmouseover="showResultTooltip('optimalTooltip', event)" onmouseout="hideResultTooltip('optimalTooltip')">OPTIMAL RANGE:</span>
-    <span class="target-value" id="optimal">--- km</span>
-    <div class="result-tooltip" id="optimalTooltip">Optymalny zasięg rakiety uwzględniający odległość uzbrajania.<br>Dla rakiet radarowych: odległość uzbrajania + 50 km zapasu.</div>
+    <span class="target-label" onmouseover="showResultTooltip('timeTooltip', event)" onmouseout="hideResultTooltip('timeTooltip')">TIME TO IMPACT:</span>
+    <span class="target-value" id="timeToImpact">00:00:00</span>
+    <div class="result-tooltip" id="timeTooltip">Czas w formacie godziny:minuty:sekundy, po którym rakieta uderzy w cel.<br>Obliczany dla rakiet z naprowadzaniem.</div>
   </div>
   
   <div class="status-line" id="statusContainer">
-    <span class="status-icon" id="statusIcon">⚠️</span>
+    <span class="status-icon" id="statusIcon"></span>
     <span id="statusText">ENTER TARGET DATA</span>
   </div>
   
@@ -404,6 +405,7 @@
 </div>
 
 <div class="footer">HF-INTERCEPT COMPUTER v2.1</div>
+<div class="mockup-overlay"></div>
 
 <script src="assets/js/script.js"></script>
 </body>

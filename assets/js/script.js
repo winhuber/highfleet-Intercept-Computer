@@ -214,6 +214,47 @@ const missiles = {
   }
 };
 
+// ========== FUNKCJA SPRAWDZAJĄCA CZY RAKIETA DOGONI CEL ==========
+function canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg) {
+  // Jeśli prędkość celu = 0, zawsze można przechwycić (o ile zasięg pozwala)
+  if (vT === 0) {
+    const distance = Math.hypot(Tx - Sx, Ty - Sy);
+    return distance <= missile.range;
+  }
+
+  const kursRad = kursDeg * Math.PI / 180;
+  const vx = vT * Math.sin(kursRad);
+  const vy = -vT * Math.cos(kursRad);
+
+  const rx = Tx - Sx;
+  const ry = Ty - Sy;
+
+  const a = vx * vx + vy * vy - missile.speed * missile.speed;
+  const b = 2 * (rx * vx + ry * vy);
+  const c = rx * rx + ry * ry;
+
+  const d = b * b - 4 * a * c;
+  if (d < 0) {
+    return false; // Brak rozwiązania matematycznego
+  }
+
+  const sqrtD = Math.sqrt(d);
+  const t1 = (-b - sqrtD) / (2 * a);
+  const t2 = (-b + sqrtD) / (2 * a);
+  const ts = [t1, t2].filter(t => t >= 0);
+
+  if (ts.length === 0) {
+    return false; // Czas spotkania byłby w przeszłości
+  }
+
+  const t = Math.min(...ts);
+  const Px = Tx + vx * t;
+  const Py = Ty + vy * t;
+
+  const distToImpact = Math.hypot(Px - Sx, Py - Sy);
+  return distToImpact <= missile.range;
+}
+
 // ========== COORDINATES MAP ==========
 function drawMap() {
   const mapContainer = document.getElementById('mapContainer');
@@ -270,9 +311,8 @@ function drawMap() {
     const ourPos = gameToPixel(sx, sy);
     ctx.fillStyle = '#00ff00';
     ctx.beginPath();
-    ctx.arc(ourPos.x, ourPos.y, 3.6, 0, Math.PI * 2);
+    ctx.arc(ourPos.x, ourPos.y, 1.6, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillText('US', ourPos.x + 6, ourPos.y - 6);
   }
   
   // Rysowanie celu
@@ -280,18 +320,17 @@ function drawMap() {
     const targetPos = gameToPixel(tx, ty);
     ctx.fillStyle = '#ff0000';
     ctx.beginPath();
-    ctx.arc(targetPos.x, targetPos.y, 3.6, 0, Math.PI * 2);
+    ctx.arc(targetPos.x, targetPos.y, 1.6, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillText('TGT', targetPos.x + 6, targetPos.y - 6);
   }
   
-  // Rysowanie markera (punkt przewidywanego trafienia)
+   // Rysowanie markera (punkt przewidywanego trafienia)
   let markerOutOfBounds = false;
   if (markerText !== "---, --- km") {
     const parts = markerText.split(",");
     if (parts.length === 2) {
       const markerX = parseInt(parts[0].trim());
-      const markerY = parseInt(parts[1].replace("km", "").trim());
+      const markerY = parseInt(parts[1].replace(/[^0-9]/g, ''));
       
       if (!isNaN(markerX) && !isNaN(markerY)) {
         if (markerX < 0 || markerX > 3000 || markerY < 0 || markerY > 2000) {
@@ -301,9 +340,8 @@ function drawMap() {
         const markerPos = gameToPixel(markerX, markerY);
         ctx.fillStyle = '#ffaa00';
         ctx.beginPath();
-        ctx.arc(markerPos.x, markerPos.y, 3.6, 0, Math.PI * 2);
+        ctx.arc(markerPos.x, markerPos.y, 2.6, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillText('MARK', markerPos.x + 6, markerPos.y - 6);
       }
     }
   }
@@ -335,14 +373,14 @@ document.getElementById('coordMap').addEventListener('mousemove', function(event
   const x = event.clientX - rect.left;
   const y = event.clientY - rect.top;
   
-let gameX = Math.round((x / rect.width) * 3000);
-let gameY = Math.round((y / rect.height) * 2000);
-
-// Ogranicz do zakresu mapy
-if (gameX < 0) gameX = 0;
-if (gameX > 3000) gameX = 3000;
-if (gameY < 0) gameY = 0;
-if (gameY > 2000) gameY = 2000;
+  let gameX = Math.round((x / rect.width) * 3000);
+  let gameY = Math.round((y / rect.height) * 2000);
+  
+  // Ogranicz do zakresu mapy
+  if (gameX < 0) gameX = 0;
+  if (gameX > 3000) gameX = 3000;
+  if (gameY < 0) gameY = 0;
+  if (gameY > 2000) gameY = 2000;
   
   lastMouseX = event.clientX;
   lastMouseY = event.clientY;
@@ -358,7 +396,7 @@ if (gameY > 2000) gameY = 2000;
     coordsElement.style.left = (event.clientX + 10) + 'px';
     coordsElement.style.top = (event.clientY + 10) + 'px';
     coordsElement.style.display = 'block';
-  }, 15); // małe opóźnienie żeby nie migało
+  }, 10);
 });
 
 document.getElementById('coordMap').addEventListener('mouseleave', function() {
@@ -373,6 +411,8 @@ function checkMissileCompatibilityOnHover(missileKey) {
   const Sy = +document.getElementById("sy").value || 0;
   const Tx = +document.getElementById("tx").value || 0;
   const Ty = +document.getElementById("ty").value || 0;
+  const vT = +document.getElementById("vt").value || 0;
+  const kursDeg = +document.getElementById("kurs").value || 0;
   
   if (Sx === 0 && Sy === 0 && Tx === 0 && Ty === 0) {
     return "neutral";
@@ -383,11 +423,18 @@ function checkMissileCompatibilityOnHover(missileKey) {
   
   const distance = Math.hypot(Tx - Sx, Ty - Sy);
   
+  // 1. Sprawdź zasięg
   if (distance > missile.range) {
     return "incompatible";
   }
   
+  // 2. Sprawdź minimalną odległość uzbrojenia
   if (missile.arming > 0 && distance < missile.arming) {
+    return "incompatible";
+  }
+  
+  // 3. Sprawdź czy rakieta dogoni cel (matematyka przechwytu)
+  if (!canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg)) {
     return "incompatible";
   }
   
@@ -414,6 +461,8 @@ function selectMissile(key) {
   selectedMissileKey = key;
   checkMissileCompatibility();
   saveToLocalStorage();
+  // Usuń podświetlenie przycisku COMPUTE
+  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 // ========== INITIALIZATION ==========
@@ -459,7 +508,7 @@ document.addEventListener("DOMContentLoaded", function() {
           tooltip.style.top = (event.clientY + 10) + "px";
           tooltip.classList.add("show");
         }
-      }, 3000); // 3 sekundy opóźnienia
+      }, 600);
     });
     
     item.addEventListener("mouseout", function() {
@@ -514,6 +563,8 @@ function validateCoordinates(input) {
   checkMissileCompatibility();
   saveToLocalStorage();
   drawMap();
+  // Usuń podświetlenie przycisku COMPUTE
+  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 // ========== DIGIT LIMITATION (for vt and kurs) ==========
@@ -532,6 +583,8 @@ function limitDigits(input, maxDigits) {
   
   checkMissileCompatibility();
   saveToLocalStorage();
+  // Usuń podświetlenie przycisku COMPUTE
+  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 // ========== INPUT FIELD KEY HANDLING ==========
@@ -590,6 +643,11 @@ function handleKeyInput(event, fieldId) {
       !(event.key === "v" && event.ctrlKey) &&
       !(event.key === "x" && event.ctrlKey)) {
     event.preventDefault();
+  }
+  
+  // Usuń podświetlenie przycisku COMPUTE po wpisaniu klawisza
+  if (allowedKeys.includes(event.key) && !event.ctrlKey && !event.metaKey) {
+    document.querySelector('.key-wide').classList.remove('confirmed');
   }
 }
 
@@ -686,6 +744,8 @@ function adjustFieldOnce(fieldId, delta) {
   if (fieldId === "sx" || fieldId === "sy" || fieldId === "tx" || fieldId === "ty") {
     drawMap();
   }
+  // Usuń podświetlenie przycisku COMPUTE
+  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 function stopArrow() {
@@ -713,6 +773,8 @@ function press(val) {
   
   checkMissileCompatibility();
   saveToLocalStorage();
+  // Usuń podświetlenie przycisku COMPUTE
+  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 // ========== CLEAR FIELD (clears only active field) ==========
@@ -722,6 +784,8 @@ function clearField() {
   checkMissileCompatibility();
   saveToLocalStorage();
   drawMap();
+  // Usuń podświetlenie przycisku COMPUTE
+  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 // ========== CLEAR ALL FIELDS (clears all fields) ==========
@@ -739,10 +803,27 @@ function clearAllFields() {
     activeField = null;
   }
   
+  // Usuń podświetlenie aktywnej rakiety
+  const activeMissile = document.querySelector(".missile-item.active");
+  if (activeMissile) {
+    activeMissile.classList.remove("active");
+  }
+  selectedMissileKey = null;
+  
+  // Usuń wszystkie podświetlenia zgodności
+  document.querySelectorAll(".missile-item").forEach(item => {
+    item.classList.remove("highlight-compatible");
+    item.classList.remove("compatible-border");
+    item.classList.remove("incompatible-border");
+  });
+  
   document.getElementById("marker").textContent = "---, --- km";
   document.getElementById("distance").textContent = "--- km";
   document.getElementById("bearing").textContent = "---°";
-  document.getElementById("optimal").textContent = "--- km";
+  document.getElementById("timeToImpact").textContent = "00:00:00";
+  
+  // Usuń podświetlenie przycisku COMPUTE
+  document.querySelector('.key-wide').classList.remove('confirmed');
   
   updateStatus("WPISZ DANE CELU", "neutral");
   saveToLocalStorage();
@@ -804,10 +885,11 @@ function checkMissileCompatibility() {
   const Tx = +document.getElementById("tx").value || 0;
   const Ty = +document.getElementById("ty").value || 0;
   const vT = +document.getElementById("vt").value || 0;
+  const kursDeg = +document.getElementById("kurs").value || 0;
   
   const missileKey = document.getElementById("rakieta").value;
   if (!missiles[missileKey]) {
-    updateStatus("⚠️ WYBIERZ RAKIETĘ", "warning");
+    updateStatus("WYBIERZ RAKIETĘ", "warning");
     return;
   }
   
@@ -822,16 +904,22 @@ function checkMissileCompatibility() {
   const distance = Math.hypot(Tx - Sx, Ty - Sy);
   
   if (distance > missile.range) {
-    updateStatus(`❌ POZA ZASIĘGIEM (${distance.toFixed(0)} > ${missile.range}km)`, "error");
+    updateStatus(`CEL POZA ZASIĘGIEM`, "error");
     return;
   }
   
   if (missile.arming > 0 && distance < missile.arming) {
-    updateStatus(`❌ ZA BLISKO (min ${missile.arming}km)`, "error");
+    updateStatus(`CEL ZA BLISKO DO UZBROJENIA`, "error");
     return;
   }
   
-  updateStatus(`✓ ${missile.name.split(" ")[0]} GOTOWA`, "success");
+  // DODANE: Sprawdzenie czy rakieta dogoni cel
+  if (!canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg)) {
+    updateStatus("CEL NIEOSIĄGALNY KINETYCZNIE", "error");
+    return;
+  }
+  
+  updateStatus(`${missile.name.split(" ")[0]} ${missile.range}km|${missile.speed}km/h`, "success");
 }
 
 // ========== STATUS UPDATE ==========
@@ -844,22 +932,51 @@ function updateStatus(message, type) {
   
   switch(type) {
     case "success":
-      statusIcon.textContent = "✓";
+      statusIcon.textContent = "";
       statusText.classList.add("status-valid");
       statusText.style.color = statusIcon.style.color = "var(--success)";
       break;
     case "error":
-      statusIcon.textContent = "❌";
+      statusIcon.textContent = "";
       statusText.style.color = statusIcon.style.color = "#ff4444";
       break;
     case "warning":
-      statusIcon.textContent = "⚠️";
+      statusIcon.textContent = "";
       statusText.style.color = statusIcon.style.color = "var(--warning)";
       break;
     default:
-      statusIcon.textContent = "ⓘ";
+      statusIcon.textContent = "";
       statusText.style.color = statusIcon.style.color = "var(--text-dim)";
   }
+}
+
+// ========== HIGHLIGHT COMPATIBLE MISSILES ==========
+function highlightCompatibleMissiles() {
+  const missileItems = document.querySelectorAll(".missile-item");
+  const Sx = +document.getElementById("sx").value || 0;
+  const Sy = +document.getElementById("sy").value || 0;
+  const Tx = +document.getElementById("tx").value || 0;
+  const Ty = +document.getElementById("ty").value || 0;
+  const vT = +document.getElementById("vt").value || 0;
+  const kursDeg = +document.getElementById("kurs").value || 0;
+  
+  if (Sx === 0 && Sy === 0 && Tx === 0 && Ty === 0) return;
+  
+  missileItems.forEach(item => {
+    const missileKey = item.dataset.key;
+    const missile = missiles[missileKey];
+    if (!missile) return;
+    
+    const distance = Math.hypot(Tx - Sx, Ty - Sy);
+    const isCompatible = distance <= missile.range && 
+                        (missile.arming === 0 || distance >= missile.arming) &&
+                        canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg);
+    
+    item.classList.remove("highlight-compatible");
+    if (isCompatible) {
+      item.classList.add("highlight-compatible");
+    }
+  });
 }
 
 // ========== MAIN CALCULATIONS ==========
@@ -873,7 +990,7 @@ function calculateTarget() {
 
   const missileKey = document.getElementById("rakieta").value;
   if (!missiles[missileKey]) {
-    updateStatus("❌ WYBIERZ RAKIETĘ", "error");
+    updateStatus("WYBIERZ RAKIETĘ", "error");
     return;
   }
 
@@ -889,16 +1006,24 @@ function calculateTarget() {
     let alpha = Math.atan2(uy, ux);
     let bearingDeg = (360 - (alpha * 180 / Math.PI) + 90) % 360;
     if (bearingDeg < 0) bearingDeg += 360;
-    const optimalRange = missile.arming + 50;
 
     document.getElementById("marker").textContent = `${markerX.toFixed(0)}, ${markerY.toFixed(0)} km`;
     document.getElementById("distance").textContent = `${distToImpact.toFixed(0)} km`;
     document.getElementById("bearing").textContent = `${bearingDeg.toFixed(0)}°`;
-    document.getElementById("optimal").textContent = `${optimalRange.toFixed(0)} km`;
 
-    updateStatus(`✓ ${missile.name.split(" ")[0]} CEL STACJONARNY`, "success");
+    // Oblicz czas w formacie HH:MM:SS
+    const timeSeconds = distToImpact / missile.speed * 3600;
+    const hours = Math.floor(timeSeconds / 3600);
+    const minutes = Math.floor((timeSeconds % 3600) / 60);
+    const seconds = Math.floor(timeSeconds % 60);
+    document.getElementById("timeToImpact").textContent = 
+      `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+    updateStatus(`${missile.name.split(" ")[0]} PARAMETRY WPROWADZONE`, "success");
     saveToLocalStorage();
     drawMap();
+    // Podświetl przycisk COMPUTE
+    document.querySelector('.key-wide').classList.add('confirmed');
     return;
   }
 
@@ -915,7 +1040,8 @@ function calculateTarget() {
 
   const d = b * b - 4 * a * c;
   if (d < 0) {
-    updateStatus("❌ BRAK ROZWIĄZANIA", "error");
+    updateStatus("CEL NIEOSIĄGALNY KINETYCZNIE", "error");
+    document.getElementById("timeToImpact").textContent = "00:00:00";
     return;
   }
 
@@ -925,7 +1051,8 @@ function calculateTarget() {
   const ts = [t1, t2].filter(t => t >= 0);
 
   if (ts.length === 0) {
-    updateStatus("❌ BRAK CZASU SPOTKANIA", "error");
+    updateStatus("CEL NIEOSIĄGALNY KINETYCZNIE", "error");
+    document.getElementById("timeToImpact").textContent = "00:00:00";
     return;
   }
 
@@ -936,20 +1063,14 @@ function calculateTarget() {
 
   const distToImpact = Math.hypot(Px - Sx, Py - Sy);
   if (distToImpact > missile.range) {
-    updateStatus(`❌ POZA ZASIĘGIEM (${distToImpact.toFixed(0)} > ${missile.range})`, "error");
+    updateStatus(`CEL POZA ZASIĘGIEM`, "error");
+    document.getElementById("timeToImpact").textContent = "00:00:00";
     return;
   }
 
   const markerX = Px;
   const markerY = Py;
   const markerDist = distToImpact;
-
-  if (missile.arming > 0) {
-    const distToArming = Math.max(0, markerDist - missile.arming);
-    if (distToArming < 50) {
-      updateStatus(`⚠️ MAŁY ZAPAS UZBROJENIA`, "warning");
-    }
-  }
 
   const ux = markerX - Sx;
   const uy = Sy - markerY;
@@ -958,17 +1079,47 @@ function calculateTarget() {
   let bearingDeg = (360 - (alpha * 180 / Math.PI) + 90) % 360;
   if (bearingDeg < 0) bearingDeg += 360;
 
-  const optimalRange = missile.arming + 50;
-
   document.getElementById("marker").textContent = `${markerX.toFixed(0)}, ${markerY.toFixed(0)} km`;
   document.getElementById("distance").textContent = `${markerDist.toFixed(0)} km`;
   document.getElementById("bearing").textContent = `${bearingDeg.toFixed(0)}°`;
-  document.getElementById("optimal").textContent = `${optimalRange.toFixed(0)} km`;
 
-  updateStatus(`✓ ${missile.name.split(" ")[0]} Parametry wybrane`, "success");
+  // Oblicz czas w formacie HH:MM:SS
+  const timeSeconds = t * 3600;
+  const hours = Math.floor(timeSeconds / 3600);
+  const minutes = Math.floor((timeSeconds % 3600) / 60);
+  const seconds = Math.floor(timeSeconds % 60);
+  document.getElementById("timeToImpact").textContent = 
+    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+  // Sprawdź zapas 15km po uzbrojeniu (cichy warunek)
+  if (missile.arming > 0) {
+    const distAfterArming = Math.max(0, markerDist - missile.arming);
+    if (distAfterArming < 15) {
+      // Cichy warunek, nie wyświetla komunikatu
+    }
+  }
+
+  updateStatus(`${missile.name.split(" ")[0]} PARAMETRY WPROWADZONE`, "success");
   saveToLocalStorage();
   drawMap();
+  highlightCompatibleMissiles();
+  // Podświetl przycisk COMPUTE
+  document.querySelector('.key-wide').classList.add('confirmed');
 }
+
+// Obsługa kółka myszy dla pól wprowadzania
+document.querySelectorAll(".input-field").forEach(field => {
+  field.addEventListener("wheel", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const fieldId = this.id;
+    const isArrowUp = event.deltaY < 0;
+    const delta = isArrowUp ? 10 : -10;
+    
+    adjustFieldOnce(fieldId, delta);
+  });
+});
 
 // ========== ARROW COORDINATES UPDATE ==========
 function updateArrowCoordinates(fieldId, currentValue) {
@@ -984,7 +1135,6 @@ function updateArrowCoordinates(fieldId, currentValue) {
     yLine.textContent = `Y: ${currentValue}`;
   }
   
-  // pokaż box obok strzałki
   coordsElement.style.display = 'block';
 }
 

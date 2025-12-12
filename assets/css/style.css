@@ -23,6 +23,22 @@
   --incompatible-red: #cc0000;
 }
 
+/* ========== MOCKUP OVERLAY (NAKŁADKA) ========== */
+.mockup-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 402px;
+  height:100%;
+  background-image: url('../images/mockup.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 100;
+}
+
 /* ========== BASE STYLES ========== */
 body {
   background: var(--bg);
@@ -34,6 +50,8 @@ body {
   max-width: 240px;
   margin: 0 auto;
   overflow-x: hidden;
+  position: relative;
+  top: 55px; /* obniża całość o 20px */
 }
 
 /* ========== HEADER (NAGŁÓWEK) ========== */
@@ -46,6 +64,8 @@ body {
   text-transform: uppercase;
   letter-spacing: 2px;
   transition: all 0.3s;
+  position: relative;
+  z-index: 50;
 }
 
 .header.warning {
@@ -65,8 +85,14 @@ body {
 .input-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 6px;
+ gap: 6px 1px; /* 6px pionowo, 15px poziomo (było 6px) */
   margin-bottom: 10px;
+  width: 90%; /* było 85%, zwiększamy */
+  column-gap: 12px; /* tylko poziome odstępy */
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 50;
 }
 
 .input-container {
@@ -82,7 +108,7 @@ body {
   height: 30px;
   background: var(--field);
   color: var(--accent);
-  border: 1px solid var(--border);
+  /* border: 1px solid var(--border); */
   border-radius: 3px;
   font-size: 17px;
   text-align: right;
@@ -95,7 +121,7 @@ body {
 
 .input-field::placeholder {
   color: var(--placeholder);
-  font-size: 10px;
+  font-size: 15px;
 }
 
 .input-field:focus {
@@ -103,7 +129,7 @@ body {
 }
 
 .input-field.active {
-  border: 3px solid var(--border-active);
+/*   border: 3px solid var(--border-active); */
   background: #1a1a1a;
 }
 
@@ -128,6 +154,7 @@ body {
 .label-line-2 {
   text-align: center;
   margin-left: 0px;
+  margin-top: 2px;
 }
 
 .input-label-two-line:has(.label-line-1:only-child) {
@@ -138,7 +165,7 @@ body {
 
 .input-field:focus ~ .input-label-two-line,
 .input-field:not(:placeholder-shown) ~ .input-label-two-line {
-  top: 2px;
+  top: 4px;
   font-size: 9px;
   color: var(--accent);
 }
@@ -147,12 +174,12 @@ body {
 .arrow-controls {
   position: absolute;
   right: 4px;
-  top: 50%;
+  top: 50.5%;
   transform: translateY(-50%);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 30px;
+  height: 27px;
   background: transparent !important;
   border: none !important;
   padding: 0;
@@ -194,12 +221,14 @@ body {
 
 .missile-menu {
   background: var(--panel);
-  border: 1px solid var(--border);
+  /* border: 1px solid var(--border); USUŃ TĘ LINIĘ */
   border-radius: 3px;
   padding: 10px;
   margin: 8px 0;
   max-height: 140px;
   overflow-y: auto;
+  position: relative;
+  z-index: 50;
 }
 
 .missile-menu::-webkit-scrollbar {
@@ -207,18 +236,23 @@ body {
 }
 
 .missile-menu::-webkit-scrollbar-track {
-  background: var(--field);
-  border-radius: 4px;
+  background: transparent;
+  border-radius: 0;
 }
 
 .missile-menu::-webkit-scrollbar-thumb {
-  background: var(--accent-dark);
-  border-radius: 4px;
-  border: 1px solid var(--border);
+  background: #493306;
+  border-radius: 2px;
+  border: 1px solid #5b3f08;
+  box-shadow: 
+    inset 0 0 3px rgba(0,0,0,0.5),
+    0 1px 1px rgba(255,255,255,0.1);
+    border-radius: 10px; /* dodajemy zaokrąglenie toru */
 }
 
+
 .missile-menu::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  background: #8f630c;
 }
 
 /* Grupy rakiet */
@@ -226,8 +260,15 @@ body {
   margin-bottom: 10px;
 }
 
+.missile-group {
+  margin-bottom: 10px;
+  border-bottom: 1px dashed #ffffff; /* biała przerywana linia */
+  padding-bottom: 8px;
+}
+
 .missile-group:last-child {
   margin-bottom: 0;
+  border-bottom: none; /* ostatnia bez linii */
 }
 
 .missile-group-header {
@@ -238,7 +279,7 @@ body {
   text-transform: uppercase;
   margin-bottom: 6px;
   padding-bottom: 6px;
-  border-bottom: 1px dashed var(--accent-dark);
+  /* border-bottom: 1px dashed var(--accent-dark); USUŃ TĘ LINIĘ */
   letter-spacing: 0.5px;
 }
 
@@ -250,7 +291,7 @@ body {
 
 .missile-item {
   background: var(--missile-bg);
-  border: 1px solid var(--border);
+  /* border: 1px solid var(--border); */
   border-radius: 3px;
   padding: 6px 8px;
   text-align: center;
@@ -271,6 +312,11 @@ body {
   background: var(--missile-active);
   border-color: var(--success);
   border-width: 2px;
+}
+
+.missile-item.highlight-compatible {
+  background-color: rgba(0, 128, 0, 0.2);
+  border-color: #00cc00;
 }
 
 /* Obramówki zgodności przy najechaniu */
@@ -320,14 +366,16 @@ body {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 3px;
-  padding: 10px;
-  margin-top: 10px;
+  padding: 15px;
+  margin-top: 4px;
+  position: relative;
+  z-index: 50;
 }
 
 .target-line {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
 }
 
 .target-label {
@@ -346,13 +394,16 @@ body {
   color: var(--text-dim);
   font-size: 12px;
   text-align: center;
-  margin-top: 6px;
+  margin-top: 8px;
   padding-top: 6px;
   border-top: 1px dashed var(--accent-dark);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 5px;
+  min-height: 15px;
+  line-height: 1.4;
+  box-sizing: border-box;
 }
 
 .status-valid {
@@ -368,7 +419,9 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 5px;
-  margin-top: 10px;
+  margin-top: 0px;
+  position: relative;
+  z-index: 50;
 }
 
 .key {
@@ -392,17 +445,18 @@ body {
 }
 
 .key-clear {
-  font-size: 15px;
+  font-size: 13px;
   text-transform: uppercase;
 }
 
 .key-wide {
   grid-column: span 3;
-  height: 36px;
+  height: 33px;
+  width: 104%; /* dodajemy szerokość */
   background: var(--field);
   color: var(--accent);
-  border: 1px solid var(--border);
-  border-radius: 3px;
+  /*  border: 1px solid var(--border);  */
+  border-radius: 5px;
   font-size: 15px;
   text-transform: uppercase;
   display: flex;
@@ -411,12 +465,20 @@ body {
   cursor: pointer;
   font-family: 'VCR OSD Mono', monospace;
   user-select: none;
-  margin-top: 10px;
+  margin-top: 32px;
+  margin-left: -5px; /* przesuń w lewo o 5px */
+  margin-right: auto;
 }
 
 .key-wide:active {
   background: var(--accent);
   color: #000;
+}
+
+.key-wide.confirmed {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
 }
 
 /* ========== MAP CONTAINER (MAPA) ========== */
@@ -425,13 +487,14 @@ body {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 3px;
-  margin-top: 8px;
+  margin-top: 22px;
   position: relative;
   overflow: hidden;
   transition: border-color 0.3s;
   aspect-ratio: 3 / 2;
   min-height: 150px;
   max-height: 400px;
+  z-index: 50;
 }
 
 .map-container.warning {
@@ -617,10 +680,13 @@ body {
 
 /* ========== FOOTER (STOPKA) ========== */
 .footer {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text-dim);
   text-align: center;
   margin-top: 8px;
   padding-top: 6px;
   border-top: 1px solid var(--border);
+  position: relative;
+  z-index: 50;
 }
+
