@@ -11,7 +11,7 @@
   --text-dim: #cfcfcf;
   --text-light: #cccccc;
   --warning: #ff5500;
-  --success: #00b600;
+  --success: #00ff00;
   --arrow: #444444;
   --tooltip-bg: #1a1a1a;
   --missile-bg: #111111;
@@ -23,11 +23,21 @@
   --incompatible-red: #cc0000;
 }
 
+/* Obrazek flagi - nad nakładką mockup */
+.lang-icon {
+  width: 35px;
+  height: 26px;
+  object-fit: contain;
+  position: relative;
+  z-index: 9999 !important;
+  border: 2px solid red !important; /* ← DODAJ TĘ LINIĘ DO TESTOWANIA */
+}
+
 /* ========== MOCKUP OVERLAY (NAKŁADKA) ========== */
 .mockup-overlay {
   position: fixed;
-  top: 50%;
-  left: 50%;
+  top: 50.1%;
+  left: 50.1%;
   transform: translate(-50%, -50%);
   width: 402px;
   height:100%;
@@ -36,7 +46,7 @@
   background-position: center;
   background-repeat: no-repeat;
   pointer-events: none;
-  z-index: 100;
+  z-index: 50;
 }
 
 /* ========== BASE STYLES ========== */
@@ -51,18 +61,26 @@ body {
   margin: 0 auto;
   overflow-x: hidden;
   position: relative;
-  top: 55px; /* obniża całość o 20px */
+  top: 5px; /* obniża całość o 20px */
+}
+
+/* ========== APP CONTAINER (GŁÓWNY KONTENER) ========== */
+.app-container {
+  width: 224px;               /* SZTYWNA SZEROKOŚĆ */
+  border: 1px solid #ff0000;  /* CZERWONA RAMKA TESTOWA */
+  margin: 0 auto;             /* WYŚRODKUJ */
+  position: relative;         /* DLA WZGLĘDNEGO POZYCJONOWANIA */
 }
 
 /* ========== HEADER (NAGŁÓWEK) ========== */
 .header {
   text-align: left;
-  padding: 6px 0;
+  padding: 1.4px 0;
   padding-left: 10px;
   border-bottom: 1px solid var(--accent);
   margin-bottom: 8px;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 0px;
   transition: all 0.3s;
   position: relative;
   z-index: 50;
@@ -74,25 +92,147 @@ body {
 }
 
 .header h1 {
-  font-size: 10px;
+  font-size: 9px;
   margin: 0;
   font-weight: normal;
   text-align: left;
-  line-height: 1.3;
+  line-height: 1;     /* ← ZMIENIONE: 1.3 → 1 */
+  white-space: nowrap; /* ← DODANE: tekst w jednej linii */
+}
+
+/* ========== HEADER LINKS ========== */
+.header-links {
+  padding: 4px 0;                   /* Padding góra-dół: 4px, boki: 0 */
+  margin-bottom: 6px;               /* Odstęp pod linkami (przed głównym nagłówkiem) */
+  border-bottom: 1px solid var(--accent); /* Szara linia pod linkami */
+  position: relative;
+  z-index: 50;
+}
+
+/* LINIA 1: Tylko zielony link (wyżej) */
+.header-line-1 {
+  display: flex;                    /* Flex dla pozycjonowania */
+  justify-content: flex-start;      /* Zielony na lewo */
+  align-items: center;              /* Wyrównanie w pionie */
+  margin-bottom: 2px;               /* Mały odstęp do linii 2 */
+}
+
+/* LINIA 2: Czerwony i niebieski obok siebie */
+.header-line-2 {
+  display: flex;                    /* Ustawienie linków obok siebie */
+  justify-content: space-between;   /* Rozłożenie: lewy-prawy */
+  align-items: center;              /* Wyrównanie w pionie do środka */
+}
+
+/* STYLES DLA WSZYSTKICH LINKÓW (WSPÓLNE) */
+.header-link {
+  display: flex;                    /* Obrazek i tekst obok siebie */
+  align-items: center;              /* Wyrównanie w pionie do środka */
+  text-decoration: none;            /* Bez podkreślenia */
+  border-radius: 3px;               /* Zaokrąglone rogi */
+  font-size: 9px;                   /* Rozmiar czcionki */
+  font-family: 'VCR OSD Mono', monospace;
+  text-transform: uppercase;        /* Wszystkie litery wielkie */
+  transition: all 0.2s;             /* Płynna animacja przy najechaniu */
+  background: var(--field);         /* Tło (ciemne) */
+}
+
+.header-link:hover {
+  background: var(--accent);        /* Tło po najechaniu (żółte) */
+  color: #000;                      /* Tekst po najechaniu (czarny) */
+}
+
+.link-text {
+  white-space: nowrap;              /* Tekst w jednej linii bez zawijania */
+}
+
+/* Obrazek flagi w czerwonym linku - większy, nad nakładką */
+.lang-icon {
+  width: 35px;                      /* SZEROKOŚĆ: 35px (było 16px) */
+  height: 26px;                     /* WYSOKOŚĆ: 26px (było 12px) */
+  object-fit: contain;              /* Zachowanie proporcji obrazka */
+  position: relative;               /* Zachowujemy relative */
+  z-index: 60;                      /* Z-INDEX: 60 (nakładka ma 50) */
+}
+
+/* ========== POSZCZEGÓLNE LINKI - INDYWIDUALNA REGULACJA ========== */
+
+/* ZIELONY LINK (linia 1, lewo) - BUY ME A COFFEE - WYŻEJ */
+.coffee-link {
+  height: 22px;                     /* Wysokość całego linku */
+  padding: 2px 69px;                 /* Padding: góra-dół 2px, boki 8px */
+  margin-left: 6px;              /* Margines od lewej: -110px (bardzo w lewo) */
+  margin-top: 0px;                 /* PODNIESIENIE: ujemny margines górny (-6px) */
+  gap: 4px;                         /* Odstęp między elementami wewnątrz */
+  
+  /* KOLORY */
+  border: 1px solid #00ff00;        /* Kolor ramki: zielony (#00ff00) */
+  color: #00ff00;                   /* Kolor tekstu: zielony */
+}
+
+.coffee-link:hover {
+  background: #00ff00 !important;   /* Tło po najechaniu: zielone */
+  color: #000 !important;           /* Tekst po najechaniu: czarny */
+}
+
+/* CZERWONY LINK EN / PL */
+.lang-link {
+  height: 18px;                     /* Wysokość całego linku */
+  padding: 2px -30px;               /* Padding: góra-dół 2px, boki -30px (ujemny) */
+  margin-left: 36px;              /* Margines od lewej: -110px (bardzo w lewo) */
+  margin-top: -8px;                 /* PODNIESIENIE: ujemny margines górny (-6px) */
+  gap: 8px;                         /* Odstęp między flagą a tekstem */
+  
+  /* KOLORY */
+  border: 1px solid #ff0000;        /* Kolor ramki: czerwony (#ff0000) */
+  color: #ff0000;                   /* Kolor tekstu: czerwony */
+}
+
+.lang-link:hover {
+  background: #ff0000 !important;   /* Tło po najechaniu: czerwone */
+  color: #000 !important;           /* Tekst po najechaniu: czarny */
+}
+
+/* NIEBIESKI LINK Coffie */
+.computer-link {
+  height: 30px;                     /* Wysokość całego linku */
+  padding: 2px 10px;                /* Padding: góra-dół 2px, boki 10px */
+  margin-right: 0px;                /* Margines od prawej krawędzi */
+  gap: 4px;                         /* Odstęp między elementami wewnątrz */
+  
+  /* KOLORY */
+  border: 1px solid #0000ff;        /* Kolor ramki: niebieski (#0000ff) */
+  color: #0000ff;                   /* Kolor tekstu: niebieski */
+}
+
+.computer-link:hover {
+  background: #0000ff !important;   /* Tło po najechaniu: niebieskie */
+  color: #000 !important;           /* Tekst po najechaniu: czarny */
 }
 
 /* ========== INPUT FIELDS (POLA WPROWADZANIA) ========== */
 .input-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
- gap: 6px 1px; /* 6px pionowo, 15px poziomo (było 6px) */
+  gap: 10px 1px;
   margin-bottom: 10px;
-  width: 90%; /* było 85%, zwiększamy */
-  column-gap: 12px; /* tylko poziome odstępy */
-  margin-left: auto;
-  margin-right: auto;
+  width: 90%;
+  column-gap: 6px;
+  margin-left: 0;
+  margin-right: 0;
   position: relative;
   z-index: 50;
+  padding: 0 10px;
+}
+
+/* LEWA KOLUMNA (1,3,5) - PRZESUNIĘTA w PRAWO o 3px */
+.input-grid > .input-container:nth-child(odd) {
+  transform: translateX(3px);  <!-- PRZESUNIĘTA w PRAWO o 3px -->
+}
+
+/* PRAWA KOLUMNA (2,4,6) - bez zmian */
+.input-grid > .input-container:nth-child(even) {
+  margin-left: 2px;
 }
 
 .input-container {
@@ -108,7 +248,6 @@ body {
   height: 30px;
   background: var(--field);
   color: var(--accent);
-  /* border: 1px solid var(--border); */
   border-radius: 3px;
   font-size: 17px;
   text-align: right;
@@ -129,14 +268,12 @@ body {
 }
 
 .input-field.active {
-/*   border: 3px solid var(--border-active); */
   background: #1a1a1a;
 }
-
 /* ========== NOWE LABELE DWULINIOWE ========== */
 .input-label-two-line {
   position: absolute;
-  top: 3px;
+  top: 5px;
   left: 5px;
   font-size: 12px;
   color: var(--placeholder);
@@ -144,6 +281,7 @@ body {
   transition: all 0.2s;
   font-family: 'VCR OSD Mono', monospace;
   text-transform: uppercase;
+  line-height: 0.7;  <!-- ZMIEŃ: domyślne → 1.2 (mniejszy odstęp między liniami) -->
 }
 
 .label-line-1 {
@@ -219,17 +357,20 @@ body {
   display: none !important;
 }
 
+
 .missile-menu {
   background: var(--panel);
-  /* border: 1px solid var(--border); USUŃ TĘ LINIĘ */
   border-radius: 3px;
   padding: 10px;
-  margin: 8px 0;
-  max-height: 140px;
+  margin: 13px 0;
+  max-height: 130px;
   overflow-y: auto;
   position: relative;
   z-index: 50;
+  margin-right: -0px;    <!-- ROZCIĄGA w PRAWO: ujemna wartość -->
+  padding-right: 15px;    <!-- Więcej miejsca po prawej -->
 }
+
 
 .missile-menu::-webkit-scrollbar {
   width: 14px;
@@ -291,16 +432,23 @@ body {
 
 .missile-item {
   background: var(--missile-bg);
-  /* border: 1px solid var(--border); */
+  border: 1px solid transparent; /* Zmienione na transparent */
   border-radius: 3px;
-  padding: 6px 8px;
+  padding: 6px 2px;
   text-align: center;
   cursor: pointer;
   transition: all 0.1s;
   user-select: none;
-  width: 185px;
+  width: 180px;
   margin: 0 auto;
+  margin: 0 auto 0 5px;
   display: block;
+}
+
+.missile-item.active {
+  background: var(--missile-active);
+  border: 2px solid #ffaa00; /* ŻÓŁTA OBRAMÓWKA dla wybranej rakiety */
+  box-shadow: 0 0 5px rgba(255, 170, 0, 0.5);
 }
 
 .missile-item:hover {
@@ -309,14 +457,17 @@ body {
 }
 
 .missile-item.active {
-  background: var(--missile-active);
-  border-color: var(--success);
-  border-width: 2px;
+  border: 1px solid #00ff00; /* Zielona cienka ramka */
 }
 
 .missile-item.highlight-compatible {
   background-color: rgba(0, 128, 0, 0.2);
-  border-color: #00cc00;
+}
+
+
+
+.missile-item.highlight-compatible {
+  background-color: rgba(0, 128, 0, 0.2);
 }
 
 /* Obramówki zgodności przy najechaniu */
@@ -363,13 +514,15 @@ body {
 
 /* ========== TARGETING PANEL (OKNO WYNIKÓW) ========== */
 .targeting-panel {
+  width: 222px;  /* ZMIENIONE: 218px → 222px */
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 15px;
-  margin-top: 4px;
+  margin: 14px auto 0 auto;
   position: relative;
   z-index: 50;
+  box-sizing: border-box;
 }
 
 .target-line {
@@ -380,7 +533,7 @@ body {
 
 .target-label {
   color: var(--text-dim);
-  font-size: 12px;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
@@ -392,9 +545,9 @@ body {
 
 .status-line {
   color: var(--text-dim);
-  font-size: 12px;
+  font-size: 11px;
   text-align: center;
-  margin-top: 8px;
+  margin-top: 5px;
   padding-top: 6px;
   border-top: 1px dashed var(--accent-dark);
   display: flex;
@@ -418,11 +571,13 @@ body {
 .keyboard {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 5px;
+  gap: 6px;
   margin-top: 0px;
   position: relative;
   z-index: 50;
 }
+
+
 
 .key {
   height: 25px;
@@ -439,6 +594,19 @@ body {
   user-select: none;
 }
 
+/* Podniesienie przycisku 0 */
+.keyboard .key:nth-child(10) {
+  transform: translateY(-1px);
+}
+
+/* Podniesienie przycisków 7, 8, 9, 0 */
+.keyboard .key:nth-child(7),
+.keyboard .key:nth-child(8),
+.keyboard .key:nth-child(9),
+.keyboard .key:nth-child(10) {
+  transform: translateY(-1px);
+}
+
 .key:active {
   background: var(--accent);
   color: #000;
@@ -447,17 +615,18 @@ body {
 .key-clear {
   font-size: 13px;
   text-transform: uppercase;
+  transform: translateY(-1px);  /* ← Więcej dla CLEAR */
 }
 
 .key-wide {
   grid-column: span 3;
   height: 33px;
-  width: 104%; /* dodajemy szerokość */
+  width: 106%; /* dodajemy szerokość */
   background: var(--field);
   color: var(--accent);
   /*  border: 1px solid var(--border);  */
   border-radius: 5px;
-  font-size: 15px;
+  font-size: 14px;
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -465,8 +634,8 @@ body {
   cursor: pointer;
   font-family: 'VCR OSD Mono', monospace;
   user-select: none;
-  margin-top: 32px;
-  margin-left: -5px; /* przesuń w lewo o 5px */
+  margin-top: 35px;
+  margin-left: -6px; /* przesuń w lewo o 5px */
   margin-right: auto;
 }
 
@@ -483,15 +652,15 @@ body {
 
 /* ========== MAP CONTAINER (MAPA) ========== */
 .map-container {
-  width: 100%;
+  width: 222px;  /* ZMIENIONE: 218px → 222px */
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 3px;
-  margin-top: 22px;
+  margin: 22px auto 0 auto;
   position: relative;
   overflow: hidden;
   transition: border-color 0.3s;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 3 / 2;  /* Wysokość: 222px × (2/3) = 148px */
   min-height: 150px;
   max-height: 400px;
   z-index: 50;
@@ -594,7 +763,6 @@ body {
   flex-grow: 1;
 }
 
-/* ========== ARROW COORDINATES DISPLAY ========== */
 .arrow-coordinates {
   position: fixed;
   background: var(--panel);
@@ -605,7 +773,7 @@ body {
   color: var(--accent);
   font-family: 'VCR OSD Mono', monospace;
   display: none;
-  z-index: 10000;
+  z-index: 100; /* ← ZMIEŃ na 100 lub 9999 */
   pointer-events: none;
 }
 
@@ -629,6 +797,7 @@ body {
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
   max-width: 300px;
   pointer-events: none;
+  z-index: 1000;  <!-- ZMIEŃ: 1000 (więcej niż nakładka 100) -->
 }
 
 .missile-tooltip.show {
@@ -678,15 +847,126 @@ body {
   display: block;
 }
 
-/* ========== FOOTER (STOPKA) ========== */
-.footer {
-  font-size: 14px;
-  color: var(--text-dim);
-  text-align: center;
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px solid var(--border);
+/* ========== BLOKADA SCROLLOWANIA (DOBRA DLA ELEKTRON) ========== */
+body {
+  overflow: hidden;  <!-- TYLKO body, nie html -->
+}
+
+.app-container {
+  overflow: hidden;
+}
+
+/* ========== MISSILE MENU STATES ========== */
+.missile-menu.disabled {
+  opacity: 0.5;
+  filter: blur(1px);
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.missile-menu.enabled {
+  opacity: 1;
+  filter: blur(0);
+  pointer-events: auto;
+}
+
+
+/* ========== USUWANIE PUSTEGO MIEJSCA POD MAPĄ ========== */
+.map-container {
+  margin-bottom: 0 !important;
+}
+
+.app-container {
+  padding-bottom: 0 !important;
+}
+
+body {
+  padding-bottom: 0 !important;
+}
+
+* {
+  margin-bottom: 0 !important;
+}
+
+/* ========== POPRAWKA WYSOKOŚCI KONTENERA ========== */
+.app-container {
+  height: auto !important;
+}
+
+/* ========== LANGUAGE SWITCHER OVERLAY FIX ========== */
+.lang-container {
+  position: relative;
+  display: inline-block;
+}
+
+.lang-icon-overlay {
+  width: 35px;
+  height: 26px;
+  object-fit: contain;
+  position: absolute;
+  z-index: 999 !important; /* Bardzo wysoko */
+  top: -15px; /* Wystaje ponad czerwone pole */
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  pointer-events: auto !important;
+}
+
+
+/* ========== FLAG OVERLAY (NAD NAKŁADKĄ) ========== */
+.lang-flag-overlay {
+  width: 87px;
+  height: 29px;
+  min-width: 50px;
+  min-height: 30px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: fixed;
+  z-index: 100 !important;
+  top: 49px;
+  left: 45.5%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  pointer-events: auto;
+  /* border: 1px solid red; */ /* Odkomentuj żeby zobaczyć pole */
+}
+
+/* Jeśli flaga jest za wysoko/za nisko, zmień top: 113px na inną wartość */
+
+
+/* Czerwony link - bez obrazka wewnątrz */
+.lang-link {
   position: relative;
   z-index: 50;
 }
 
+/* ========== RAMKI DIAGNOSTYCZNE (CZARNE = NIEWIDOCZNE) ========== */
+.header {
+  border: 2px solid #000000 !important;  <!-- CZARNY = NIEWIDOCZNY -->
+}
+
+.map-container {
+  border: 2px solid #000000 !important;  <!-- CZARNY = NIEWIDOCZNY -->
+}
+
+.app-container {
+  border: 2px solid #000000 !important;  <!-- CZARNY = NIEWIDOCZNY -->
+}
+
+.input-grid {
+  border: 1px solid #000000 !important;  <!-- CZARNY = NIEWIDOCZNY -->
+}
+
+.missile-menu {
+  border: 1px solid #000000 !important;  <!-- CZARNY = NIEWIDOCZNY -->
+}
+
+.targeting-panel {
+  border: 1px solid #000000 !important;  <!-- CZARNY = NIEWIDOCZNY -->
+}
+
+.keyboard {
+  border: 1px solid #000000 !important;  <!-- CZARNY = NIEWIDOCZNY -->
+  
+}

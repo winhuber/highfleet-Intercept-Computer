@@ -10,10 +10,41 @@
 </head>
 <body>
 
-<div class="header" id="mainHeader">
-  <h1>HF-INTERCEPT<br>COMPUTER</h1>
-</div>
+<!-- ========== MAIN APP CONTAINER ========== -->
+<div class="app-container">
 
+<!-- ========== HEADER LINKS SECTION ========== -->
+<div class="header-links">
+    <!-- LINIA 1: Tylko zielony link (wyżej) -->
+    <div class="header-line-1">
+        <!-- Zielony link - Buy Me a Coffee -->
+        <a href="https://buymeacoffee.com/gregwise" target="_blank" class="header-link coffee-link">
+          <span class="link-text" data-i18n="headerLinks.buyCoffee">BUY ME A COFFEE</span>
+        </a>
+    </div>
+    
+    <!-- LINIA 2: Czerwony i niebieski obok siebie -->
+    <div class="header-line-2">
+        <!-- Czerwony link - zmiana języka EN-PL-->
+        <a href="#" class="header-link lang-link" onclick="toggleLanguage(event)">
+          <span class="link-text" data-i18n="headerLinks.languageSwitch">ENPL</span>
+        </a>
+        
+        <!-- Niebieski link - Cup Off Coffiee -->
+        <a href="https://buymeacoffee.com/gregwise" target="_blank" class="header-link computer-link">
+          <span class="link-text" data-i18n="headerLinks.coffeeCup">Coffie</span>
+        </a>
+    </div>
+</div>
+<!-- ========== END HEADER LINKS SECTION ========== -->
+
+<!-- ========== MAIN HEADER ========== -->
+<div class="header" id="mainHeader">
+  <h1 data-i18n="app.title">HF-INTERCEPT COMP</h1>
+</div>
+<!-- ========== END MAIN HEADER ========== -->
+
+<!-- ========== INPUT FIELDS GRID ========== -->
 <div class="input-grid">
   
   <!-- OUR X -->
@@ -21,8 +52,8 @@
     <div class="input-with-label">
       <input id="sx" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'sx')" oninput="validateCoordinates(this)">
       <div class="input-label-two-line" data-for="sx">
-        <div class="label-line-1">OUR</div>
-        <div class="label-line-2">X</div>
+        <div class="label-line-1" data-i18n="inputFields.our">OUR</div>
+        <div class="label-line-2" data-i18n="inputFields.x">X</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -36,8 +67,8 @@
     <div class="input-with-label">
       <input id="sy" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'sy')" oninput="validateCoordinates(this)">
       <div class="input-label-two-line" data-for="sy">
-        <div class="label-line-1">OUR</div>
-        <div class="label-line-2">Y</div>
+        <div class="label-line-1" data-i18n="inputFields.our">OUR</div>
+        <div class="label-line-2" data-i18n="inputFields.y">Y</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -51,8 +82,8 @@
     <div class="input-with-label">
       <input id="tx" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'tx')" oninput="validateCoordinates(this)">
       <div class="input-label-two-line" data-for="tx">
-        <div class="label-line-1">TAR.</div>
-        <div class="label-line-2">X</div>
+        <div class="label-line-1" data-i18n="inputFields.target">TAR.</div>
+        <div class="label-line-2" data-i18n="inputFields.x">X</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -66,8 +97,8 @@
     <div class="input-with-label">
       <input id="ty" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'ty')" oninput="validateCoordinates(this)">
       <div class="input-label-two-line" data-for="ty">
-        <div class="label-line-1">TAR.</div>
-        <div class="label-line-2">Y</div>
+        <div class="label-line-1" data-i18n="inputFields.target">TAR.</div>
+        <div class="label-line-2" data-i18n="inputFields.y">Y</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -81,7 +112,7 @@
     <div class="input-with-label">
       <input id="vt" class="input-field" type="text" maxlength="4" placeholder="0000" onkeydown="handleKeyInput(event, 'vt')" oninput="limitDigits(this, 4)">
       <div class="input-label-two-line" data-for="vt">
-        <div class="label-line-1">SPEED</div>
+        <div class="label-line-1" data-i18n="inputFields.speed">SPEED</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -95,7 +126,7 @@
     <div class="input-with-label">
       <input id="kurs" class="input-field" type="text" maxlength="3" placeholder="000" onkeydown="handleKeyInput(event, 'kurs')" oninput="limitDigits(this, 3)">
       <div class="input-label-two-line" data-for="kurs">
-        <div class="label-line-1">BEARING</div>
+        <div class="label-line-1" data-i18n="inputFields.bearing">BEARING</div>
       </div>
     </div>
     <div class="arrow-controls">
@@ -105,265 +136,271 @@
   </div>
   
 </div>
+<!-- ========== END INPUT FIELDS GRID ========== -->
 
+<!-- ========== HIDDEN ROCKET SELECT ========== -->
 <select id="rakieta" class="rocket-select-hidden" onchange="checkMissileCompatibility()">
-    <optgroup label="Kh-15 (Cruise Missile)">
+    <optgroup label="Kh-15 (Cruise Missile)" data-i18n="missileMenu.kh15">
       <option value="Kh15">Kh-15</option>
       <option value="Kh15N">Kh-15N</option>
       <option value="Kh15P">Kh-15P</option>
     </optgroup>
-    <optgroup label="Kh-22 (Cruise Missile)">
+    <optgroup label="Kh-22 (Cruise Missile)" data-i18n="missileMenu.kh22">
       <option value="Kh22">Kh-22</option>
       <option value="Kh22N">Kh-22N</option>
     </optgroup>
-    <optgroup label="A-100 (Tactical Missile)">
+    <optgroup label="A-100 (Tactical Missile)" data-i18n="missileMenu.a100">
       <option value="A100">A-100</option>
       <option value="A100N">A-100N</option>
     </optgroup>
-    <optgroup label="R-9 Sprint (AA Defence)">
+    <optgroup label="R-9 Sprint (AA Defence)" data-i18n="missileMenu.r9">
       <option value="R9">R-9 Sprint</option>
     </optgroup>
-    <optgroup label="R-3 (Ballistic Missile)">
+    <optgroup label="R-3 (Ballistic Missile)" data-i18n="missileMenu.r3">
       <option value="R3">R-3</option>
       <option value="R3N">R-3N</option>
     </optgroup>
-    <optgroup label="R-5 Zenith (Air-to-Air)">
+    <optgroup label="R-5 Zenith (Air-to-Air)" data-i18n="missileMenu.r5">
       <option value="R5">R-5 Zenith</option>
     </optgroup>
-    <optgroup label="K-13 AAM (Air-to-Air)">
+    <optgroup label="K-13 AAM (Air-to-Air)" data-i18n="missileMenu.k13">
       <option value="K13">K-13</option>
     </optgroup>
-    <optgroup label="S-13 NURS (Unguided)">
+    <optgroup label="S-13 NURS (Unguided)" data-i18n="missileMenu.s13">
       <option value="S13">S-13</option>
     </optgroup>
-    <optgroup label="FAB Bombs">
+    <optgroup label="FAB Bombs" data-i18n="missileMenu.fab">
       <option value="FAB100">FAB-100</option>
       <option value="FAB250">FAB-250</option>
     </optgroup>
 </select>
+<!-- ========== END HIDDEN ROCKET SELECT ========== -->
 
-<div class="missile-menu">
+<!-- ========== MISSILE MENU ========== -->
+<div class="missile-menu disabled" id="missileMenu">
   <div class="missile-group">
-    <div class="missile-group-header">Kh-15 (Cruise Missile)</div>
+    <div class="missile-group-header" data-i18n="missileMenu.kh15">Kh-15 (Cruise Missile)</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="Kh15">
         <div class="missile-header">
-          <span class="missile-name">Kh-15</span>
-          <span class="missile-stats">1600km|900km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.kh15.name">Kh-15</span>
+          <span class="missile-stats" data-i18n="missileDetails.kh15.stats">1600km|900km/h</span>
         </div>
-        <div class="missile-purpose">naziemne/morskie</div>
+        <div class="missile-purpose" data-i18n="missileDetails.kh15.purpose">naziemne/morskie</div>
       </div>
       <div class="missile-item" data-key="Kh15N">
         <div class="missile-header">
-          <span class="missile-name">Kh-15N</span>
-          <span class="missile-stats">1600km|900km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.kh15N.name">Kh-15N</span>
+          <span class="missile-stats" data-i18n="missileDetails.kh15N.stats">1600km|900km/h</span>
         </div>
-        <div class="missile-purpose">Broń strategiczna</div>
+        <div class="missile-purpose" data-i18n="missileDetails.kh15N.purpose">Broń strategiczna</div>
       </div>
       <div class="missile-item" data-key="Kh15P">
         <div class="missile-header">
-          <span class="missile-name">Kh-15P</span>
-          <span class="missile-stats">1600km|900km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.kh15P.name">Kh-15P</span>
+          <span class="missile-stats" data-i18n="missileDetails.kh15P.stats">1600km|900km/h</span>
         </div>
-        <div class="missile-purpose">Przeciwradarowa</div>
+        <div class="missile-purpose" data-i18n="missileDetails.kh15P.purpose">Przeciwradarowa</div>
       </div>
     </div>
   </div>
 
   <div class="missile-group">
-    <div class="missile-group-header">Kh-22 (Cruise Missile)</div>
+    <div class="missile-group-header" data-i18n="missileMenu.kh22">Kh-22 (Cruise Missile)</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="Kh22">
         <div class="missile-header">
-          <span class="missile-name">Kh-22</span>
-          <span class="missile-stats">2500km|1200km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.kh22.name">Kh-22</span>
+          <span class="missile-stats" data-i18n="missileDetails.kh22.stats">2500km|1200km/h</span>
         </div>
-        <div class="missile-purpose">strategiczne/flota</div>
+        <div class="missile-purpose" data-i18n="missileDetails.kh22.purpose">strategiczne/flota</div>
       </div>
       <div class="missile-item" data-key="Kh22N">
         <div class="missile-header">
-          <span class="missile-name">Kh-22N</span>
-          <span class="missile-stats">2500km|1200km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.kh22N.name">Kh-22N</span>
+          <span class="missile-stats" data-i18n="missileDetails.kh22N.stats">2500km|1200km/h</span>
         </div>
-        <div class="missile-purpose">Broń strategiczna</div>
+        <div class="missile-purpose" data-i18n="missileDetails.kh22N.purpose">Broń strategiczna</div>
       </div>
     </div>
   </div>
 
   <div class="missile-group">
-    <div class="missile-group-header">A-100 (Tactical Missile)</div>
+    <div class="missile-group-header" data-i18n="missileMenu.a100">A-100 (Tactical Missile)</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="A100">
         <div class="missile-header">
-          <span class="missile-name">A-100</span>
-          <span class="missile-stats">400km|4000km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.a100.name">A-100</span>
+          <span class="missile-stats" data-i18n="missileDetails.a100.stats">400km|4000km/h</span>
         </div>
-        <div class="missile-purpose">Przeciwlotnicze</div>
+        <div class="missile-purpose" data-i18n="missileDetails.a100.purpose">Przeciwlotnicze</div>
       </div>
       <div class="missile-item" data-key="A100N">
         <div class="missile-header">
-          <span class="missile-name">A-100N</span>
-          <span class="missile-stats">400km|4000km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.a100N.name">A-100N</span>
+          <span class="missile-stats" data-i18n="missileDetails.a100N.stats">400km|4000km/h</span>
         </div>
-        <div class="missile-purpose">Uderzenia nuklearne</div>
+        <div class="missile-purpose" data-i18n="missileDetails.a100N.purpose">Uderzenia nuklearne</div>
       </div>
     </div>
   </div>
 
   <div class="missile-group">
-    <div class="missile-group-header">R-9 Sprint (AA Defence)</div>
+    <div class="missile-group-header" data-i18n="missileMenu.r9">R-9 Sprint (AA Defence)</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="R9">
         <div class="missile-header">
-          <span class="missile-name">R-9</span>
-          <span class="missile-stats">200km|5000km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.r9.name">R-9</span>
+          <span class="missile-stats" data-i18n="missileDetails.r9.stats">200km|5000km/h</span>
         </div>
-        <div class="missile-purpose">Obrona punktowa</div>
+        <div class="missile-purpose" data-i18n="missileDetails.r9.purpose">Obrona punktowa</div>
       </div>
     </div>
   </div>
 
   <div class="missile-group">
-    <div class="missile-group-header">R-3 (Ballistic Missile)</div>
+    <div class="missile-group-header" data-i18n="missileMenu.r3">R-3 (Ballistic Missile)</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="R3">
         <div class="missile-header">
-          <span class="missile-name">R-3</span>
-          <span class="missile-stats">2000km|8280km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.r3.name">R-3</span>
+          <span class="missile-stats" data-i18n="missileDetails.r3.stats">2000km|8280km/h</span>
         </div>
-        <div class="missile-purpose">Ataki balistyczne</div>
+        <div class="missile-purpose" data-i18n="missileDetails.r3.purpose">Ataki balistyczne</div>
       </div>
       <div class="missile-item" data-key="R3N">
         <div class="missile-header">
-          <span class="missile-name">R-3N</span>
-          <span class="missile-stats">2000km|8280km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.r3N.name">R-3N</span>
+          <span class="missile-stats" data-i18n="missileDetails.r3N.stats">2000km|8280km/h</span>
         </div>
-        <div class="missile-purpose">Uderzenia strategiczne</div>
+        <div class="missile-purpose" data-i18n="missileDetails.r3N.purpose">Uderzenia strategiczne</div>
       </div>
     </div>
   </div>
 
   <div class="missile-group">
-    <div class="missile-group-header">R-5 Zenith (Air-to-Air)</div>
+    <div class="missile-group-header" data-i18n="missileMenu.r5">R-5 Zenith (Air-to-Air)</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="R5">
         <div class="missile-header">
-          <span class="missile-name">R-5</span>
-          <span class="missile-stats">30km|2000km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.r5.name">R-5</span>
+          <span class="missile-stats" data-i18n="missileDetails.r5.stats">30km|2000km/h</span>
         </div>
-        <div class="missile-purpose">Walka powietrzna WVR</div>
+        <div class="missile-purpose" data-i18n="missileDetails.r5.purpose">Walka powietrzna WVR</div>
       </div>
     </div>
   </div>
 
   <div class="missile-group">
-    <div class="missile-group-header">K-13 AAM (Air-to-Air)</div>
+    <div class="missile-group-header" data-i18n="missileMenu.k13">K-13 AAM (Air-to-Air)</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="K13">
         <div class="missile-header">
-          <span class="missile-name">K-13</span>
-          <span class="missile-stats">30km|2000km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.k13.name">K-13</span>
+          <span class="missile-stats" data-i18n="missileDetails.k13.stats">30km|2000km/h</span>
         </div>
-        <div class="missile-purpose">Walka powietrzna</div>
+        <div class="missile-purpose" data-i18n="missileDetails.k13.purpose">Walka powietrzna</div>
       </div>
     </div>
   </div>
 
   <div class="missile-group">
-    <div class="missile-group-header">S-13 NURS (Unguided)</div>
+    <div class="missile-group-header" data-i18n="missileMenu.s13">S-13 NURS (Unguided)</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="S13">
         <div class="missile-header">
-          <span class="missile-name">S-13</span>
-          <span class="missile-stats">20km|1500km/h</span>
+          <span class="missile-name" data-i18n="missileDetails.s13.name">S-13</span>
+          <span class="missile-stats" data-i18n="missileDetails.s13.stats">20km|1500km/h</span>
         </div>
-        <div class="missile-purpose">Ataki naziemne</div>
+        <div class="missile-purpose" data-i18n="missileDetails.s13.purpose">Ataki naziemne</div>
       </div>
     </div>
   </div>
 
   <div class="missile-group">
-    <div class="missile-group-header">FAB Bombs</div>
+    <div class="missile-group-header" data-i18n="missileMenu.fab">FAB Bombs</div>
     <div class="missile-grid">
       <div class="missile-item" data-key="FAB100">
         <div class="missile-header">
-          <span class="missile-name">FAB-100</span>
-          <span class="missile-stats">5km|sw. spadek</span>
+          <span class="missile-name" data-i18n="missileDetails.fab100.name">FAB-100</span>
+          <span class="missile-stats" data-i18n="missileDetails.fab100.stats">5km|sw. spadek</span>
         </div>
-        <div class="missile-purpose">Naloty bombowe</div>
+        <div class="missile-purpose" data-i18n="missileDetails.fab100.purpose">Naloty bombowe</div>
       </div>
       <div class="missile-item" data-key="FAB250">
         <div class="missile-header">
-          <span class="missile-name">FAB-250</span>
-          <span class="missile-stats">5km|sw. spadek</span>
+          <span class="missile-name" data-i18n="missileDetails.fab250.name">FAB-250</span>
+          <span class="missile-stats" data-i18n="missileDetails.fab250.stats">5km|sw. spadek</span>
         </div>
-        <div class="missile-purpose">Naloty bombowe</div>
+        <div class="missile-purpose" data-i18n="missileDetails.fab250.purpose">Naloty bombowe</div>
       </div>
     </div>
   </div>
 </div>
+<!-- ========== END MISSILE MENU ========== -->
 
+<!-- ========== MISSILE TOOLTIP ========== -->
 <div class="missile-tooltip" id="missileTooltip">
   <div class="tooltip-title" id="tooltipName">KH-15 CRUISE MISSILE</div>
   <div class="tooltip-item">
-    <span class="tooltip-label">Naprowadzanie:</span>
+    <span class="tooltip-label" data-i18n="missileTooltips.guidance">Naprowadzanie:</span>
     <span class="tooltip-value" id="tooltipGuidance">WAYPOINT GUIDANCE | Pośrednie naprowadzanie</span>
   </div>
   <div class="tooltip-item">
-    <span class="tooltip-label">Zapalnik:</span>
+    <span class="tooltip-label" data-i18n="missileTooltips.fuse">Zapalnik:</span>
     <span class="tooltip-value" id="tooltipFuse">PROXIMITY FUSE | Zapalnik zbliżeniowy</span>
   </div>
   <div class="tooltip-item">
-    <span class="tooltip-label">Głowica:</span>
+    <span class="tooltip-label" data-i18n="missileTooltips.warhead">Głowica:</span>
     <span class="tooltip-value" id="tooltipWarhead">HIGH-EXPLOSIVE | Burząca</span>
   </div>
   <div class="tooltip-item">
-    <span class="tooltip-label">Prędkość:</span>
+    <span class="tooltip-label" data-i18n="missileTooltips.speed">Prędkość:</span>
     <span class="tooltip-value" id="tooltipSpeed">900 km/h</span>
   </div>
   <div class="tooltip-item">
-    <span class="tooltip-label">Uzbrojenie:</span>
+    <span class="tooltip-label" data-i18n="missileTooltips.arming">Uzbrojenie:</span>
     <span class="tooltip-value" id="tooltipArming">100 km od startu</span>
   </div>
   <div class="tooltip-item">
-    <span class="tooltip-label">Kontekst:</span>
+    <span class="tooltip-label" data-i18n="missileTooltips.context">Kontekst:</span>
     <span class="tooltip-value" id="tooltipContext">Rakieta przeciwradiacyjna, niszczy systemy radarowe</span>
   </div>
 </div>
+<!-- ========== END MISSILE TOOLTIP ========== -->
 
+<!-- ========== TARGETING PANEL ========== -->
 <div class="targeting-panel" id="wynik">
   <div class="target-line">
-    <span class="target-label" onmouseover="showResultTooltip('markerTooltip', event)" onmouseout="hideResultTooltip('markerTooltip')">MARKER COORDS:</span>
+    <span class="target-label" data-i18n="targetingPanel.markerCoords" onmouseover="showResultTooltip('markerTooltip', event)" onmouseout="hideResultTooltip('markerTooltip')">MARKER COORDS:</span>
     <span class="target-value" id="marker">---, --- km</span>
-    <div class="result-tooltip" id="markerTooltip">Współrzędne punktu, w który należy wycelować rakietę.<br>Rakieta poleci w to miejsce i po uzbrojeniu zacznie szukać celu.</div>
   </div>
   <div class="target-line">
-    <span class="target-label" onmouseover="showResultTooltip('distanceTooltip', event)" onmouseout="hideResultTooltip('distanceTooltip')">DISTANCE:</span>
+    <span class="target-label" data-i18n="targetingPanel.distance" onmouseover="showResultTooltip('distanceTooltip', event)" onmouseout="hideResultTooltip('distanceTooltip')">DISTANCE:</span>
     <span class="target-value" id="distance">--- km</span>
-    <div class="result-tooltip" id="distanceTooltip">Odległość od twojej pozycji do punktu celowania.<br>Musi być mniejsza niż maksymalny zasięg rakiety.</div>
   </div>
   <div class="target-line">
-    <span class="target-label" onmouseover="showResultTooltip('bearingTooltip', event)" onmouseout="hideResultTooltip('bearingTooltip')">BEARING:</span>
+    <span class="target-label" data-i18n="targetingPanel.bearing" onmouseover="showResultTooltip('bearingTooltip', event)" onmouseout="hideResultTooltip('bearingTooltip')">BEARING:</span>
     <span class="target-value" id="bearing">---°</span>
-    <div class="result-tooltip" id="bearingTooltip">Kierunek w stopniach (0-360°), w którym należy wystrzelić rakietę.<br>0° = północ, 90° = wschód, 180° = południe, 270° = zachód.</div>
   </div>
 
   <div class="target-line">
-    <span class="target-label" onmouseover="showResultTooltip('timeTooltip', event)" onmouseout="hideResultTooltip('timeTooltip')">TIME TO IMPACT:</span>
+    <span class="target-label" data-i18n="targetingPanel.timeToImpact" onmouseover="showResultTooltip('timeTooltip', event)" onmouseout="hideResultTooltip('timeTooltip')">TIME TO IMPACT:</span>
     <span class="target-value" id="timeToImpact">00:00:00</span>
-    <div class="result-tooltip" id="timeTooltip">Czas w formacie godziny:minuty:sekundy, po którym rakieta uderzy w cel.<br>Obliczany dla rakiet z naprowadzaniem.</div>
   </div>
   
   <div class="status-line" id="statusContainer">
     <span class="status-icon" id="statusIcon"></span>
-    <span id="statusText">ENTER TARGET DATA</span>
+    <span id="statusText" data-i18n="targetingPanel.enterTargetData">ENTER TARGET DATA</span>
   </div>
   
   <div class="key-wide" onclick="calculateTarget()">
-    COMPUTE FIRING SOLUTION
+    <span data-i18n="targetingPanel.computeFiringSolution">COMPUTE FIRING SOLUTION</span>
   </div>
 </div>
+<!-- ========== END TARGETING PANEL ========== -->
 
+<!-- ========== KEYBOARD ========== -->
 <div class="keyboard">
   <div class="key" onclick="press('1')">1</div>
   <div class="key" onclick="press('2')">2</div>
@@ -376,10 +413,16 @@
   <div class="key" onclick="press('9')">9</div>
   
   <div class="key" onclick="press('0')">0</div>
-  <div class="key key-clear" onclick="clearField()">CLEAR</div>
-  <div class="key key-clear" onclick="clearAllFields()">CLEAR ALL</div>
+  <div class="key key-clear" onclick="clearField()">
+    <span data-i18n="keyboard.clear">CLEAR</span>
+  </div>
+  <div class="key key-clear" onclick="clearAllFields()">
+    <span data-i18n="keyboard.clearAll">CLEAR ALL</span>
+  </div>
 </div>
+<!-- ========== END KEYBOARD ========== -->
 
+<!-- ========== MAP CONTAINER ========== -->
 <div class="map-container" id="mapContainer">
   <canvas id="coordMap"></canvas>
   <div id="mapCoords" class="arrow-coordinates"></div>
@@ -387,25 +430,43 @@
     <div class="coord-line">X: ---</div>
     <div class="coord-line">Y: ---</div>
   </div>
-  <div class="map-warning" id="mapWarning">
+  <div class="map-warning" id="mapWarning" data-i18n="map.warning">
     WARNING: IMPACT OUT OF MAP BOUNDS
   </div>
   
   <div class="map-labels-top">
-    <div class="map-label-left-top">OUR POSITION</div>
-    <div class="map-label-center-top">TARGET</div>
-    <div class="map-label-right-top">INTERCEPT POINT</div>
+    <div class="map-label-left-top" data-i18n="map.ourPosition">OUR POSITION</div>
+    <div class="map-label-center-top" data-i18n="map.target">TARGET</div>
+    <div class="map-label-right-top" data-i18n="map.interceptPoint">INTERCEPT POINT</div>
   </div>
   
   <div class="map-labels-bottom">
     <div class="map-label-left">X:0 Y:0</div>
-    <div class="map-label-center">INTERCEPT MAP</div>
+    <div class="map-label-center" data-i18n="map.interceptMap">INTERCEPT MAP</div>
     <div class="map-label-right">X:3000 Y:2000</div>
   </div>
 </div>
+<!-- ========== END MAP CONTAINER ========== -->
 
-<div class="footer">HF-INTERCEPT COMPUTER v2.1</div>
+</div>  <!-- To zamyka .app-container -->
+
+<!-- ========== MOCKUP OVERLAY ========== -->
 <div class="mockup-overlay"></div>
+
+<!-- ========== RESULT TOOLTIPS ========== -->
+<div class="result-tooltip" id="markerTooltip">Współrzędne punktu, w który należy wycelować rakietę.<br>Rakieta poleci w to miejsce i po uzbrojeniu zacznie szukać celu.</div>
+<div class="result-tooltip" id="distanceTooltip">Odległość od twojej pozycji do punktu celowania.<br>Musi być mniejsza niż maksymalny zasięg rakiety.</div>
+<div class="result-tooltip" id="bearingTooltip">Kierunek w stopniach (0-360°), w którym należy wystrzelić rakietę.<br>0° = północ, 90° = wschód, 180° = południe, 270° = zachód.</div>
+<div class="result-tooltip" id="timeTooltip">Czas w formacie godziny:minuty:sekundy, po którym rakieta uderzy w cel.<br>Obliczany dla rakiet z naprowadzaniem.</div>
+
+<!-- ========== DIMENSIONS DISPLAY ========== -->
+<div id="wymiary" style="color: white; text-align: center; font-size: 10px; padding: 5px;">
+  Wymiary: <span id="szerokosc">?</span>px × <span id="wysokosc">?</span>px
+</div>
+
+<!-- Obrazek flagi - NAD nakładką (jako tło) -->
+<div class="lang-flag-overlay" id="langIcon" onclick="toggleLanguage()"
+     style="background-image: url('assets/images/pl.png')"></div>
 
 <script src="assets/js/script.js"></script>
 </body>

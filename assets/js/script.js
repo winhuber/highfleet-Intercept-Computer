@@ -1,5 +1,173 @@
 console.log("Script loaded - version 1.0");
 
+// ========== SYSTEM TŁUMACZEŃ ==========
+let currentLanguage = 'pl'; // 'pl' lub 'en'
+let translations = {};
+
+// Ładowanie tłumaczeń z pliku JSON
+async function loadTranslations(lang) {
+  try {
+    const response = await fetch(`assets/lang/${lang}.json`);
+    translations = await response.json();
+    applyTranslations();
+  } catch (error) {
+    console.error('Błąd ładowania tłumaczeń:', error);
+    // Fallback - próbuj załadować angielski
+    if (lang !== 'en') {
+      try {
+        const response = await fetch(`assets/lang/en.json`);
+        translations = await response.json();
+        applyTranslations();
+      } catch (e) {
+        console.error('Nie można załadować żadnych tłumaczeń');
+      }
+    }
+  }
+}
+
+// Aplikowanie tłumaczeń do wszystkich elementów z data-i18n
+function applyTranslations() {
+  // Tłumaczenie elementów HTML z atrybutem data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    const keys = element.getAttribute('data-i18n').split('.');
+    let value = translations;
+    
+    for (const key of keys) {
+      if (value && value[key]) {
+        value = value[key];
+      } else {
+        value = null;
+        break;
+      }
+    }
+    
+    if (value && typeof value === 'string') {
+      // Sprawdź czy element ma HTML (np. <br>)
+      if (value.includes('<br>')) {
+        element.innerHTML = value;
+      } else {
+        element.textContent = value;
+      }
+    }
+  });
+  
+  // Aktualizacja napisów w wynikach (dla starego kodu)
+  if (translations.status) {
+    // Nic nie robimy tutaj - updateStatus() będzie używać tłumaczeń
+  }
+}
+
+// Przełączanie języka
+function toggleLanguage(event) {
+  if (event) event.preventDefault();
+  
+  playSound('click');
+  
+  const langIcon = document.getElementById('langIcon');
+  
+  if (currentLanguage === 'pl') {
+    currentLanguage = 'en';
+    langIcon.style.backgroundImage = "url('assets/images/en.png')";
+    loadTranslations('en');
+  } else {
+    currentLanguage = 'pl';
+    langIcon.style.backgroundImage = "url('assets/images/pl.png')";
+    loadTranslations('pl');
+  }
+  
+  // Zapisz wybór języka do localStorage
+  try {
+    localStorage.setItem('hf_intercept_language', currentLanguage);
+  } catch (e) {}
+    
+  return false;
+}
+
+// ========== DŹWIĘKI ==========
+const sounds = {};
+const soundFiles = {
+  clear: 'assets/sounds/clear.wav',
+  click: 'assets/sounds/click.wav', 
+  error: 'assets/sounds/error.wav',
+  success: 'assets/sounds/success.wav',
+  tick: 'assets/sounds/tick.wav'
+};
+
+function loadSounds() {
+  for (const [name, url] of Object.entries(soundFiles)) {
+    sounds[name] = new Audio(url);
+    sounds[name].load();
+  }
+}
+
+function playSound(soundName) {
+  if (!sounds[soundName]) return;
+  try {
+    const sound = sounds[soundName];
+    sound.currentTime = 0;
+    sound.play().catch(e => {});
+  } catch (e) {}
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  loadSounds();
+  
+  // Ładujemy domyślny język z localStorage
+  try {
+    const savedLang = localStorage.getItem('hf_intercept_language');
+    if (savedLang && (savedLang === 'pl' || savedLang === 'en')) {
+      currentLanguage = savedLang;
+      const langIcon = document.getElementById('langIcon');
+      langIcon.style.backgroundImage = `url('assets/images/${currentLanguage}.png')`;
+    }
+  } catch (e) {}
+  
+  // Ładujemy tłumaczenia
+  loadTranslations(currentLanguage);
+  
+  // INICJALIZACJA DŹWIĘKU NA STARCIE
+  setTimeout(() => {
+    try {
+      const initSound = new Audio('assets/sounds/tick.wav');
+      initSound.volume = 0.01;
+      initSound.play().catch(() => {});
+      setTimeout(() => { initSound.pause(); }, 100);
+    } catch(e) {}
+  }, 300);
+});
+
+// ========== STAN APLIKACJI ==========
+let showMissileHighlights = false; // Czy pokazywać podświetlenia rakiet
+let computeButtonState = 'off'; // Stan przycisku COMPUTE: 'off', 'temporary', 'on'
+let selectedMissileKey = null; // Wybrana rakieta
+
+// ========== RESET APP STATE ==========
+function resetAppState() {
+  // Wyłącz podświetlenia rakiet
+  showMissileHighlights = false;
+  document.querySelectorAll(".missile-item").forEach(item => {
+    item.classList.remove("highlight-compatible");
+    item.classList.remove("active");
+  });
+  
+  // Resetuj wybór rakiety
+  selectedMissileKey = null;
+  document.getElementById("rakieta").value = "";
+  
+  // Wyłącz przycisk COMPUTE
+  document.querySelector('.key-wide').classList.remove('confirmed');
+  
+  // Zresetuj status do białego napisu
+  updateStatus("status.enterData", "neutral");
+  
+  // Wyłącz menu rakiet
+  const missileMenu = document.getElementById('missileMenu');
+  if (missileMenu) {
+    missileMenu.classList.add('disabled');
+    missileMenu.classList.remove('enabled');
+  }
+}
+
 // ========== MISSILE CONFIGURATION ==========
 const missiles = {
   "Kh15": { 
@@ -216,7 +384,6 @@ const missiles = {
 
 // ========== FUNKCJA SPRAWDZAJĄCA CZY RAKIETA DOGONI CEL ==========
 function canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg) {
-  // Jeśli prędkość celu = 0, zawsze można przechwycić (o ile zasięg pozwala)
   if (vT === 0) {
     const distance = Math.hypot(Tx - Sx, Ty - Sy);
     return distance <= missile.range;
@@ -234,18 +401,14 @@ function canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg) {
   const c = rx * rx + ry * ry;
 
   const d = b * b - 4 * a * c;
-  if (d < 0) {
-    return false; // Brak rozwiązania matematycznego
-  }
+  if (d < 0) return false;
 
   const sqrtD = Math.sqrt(d);
   const t1 = (-b - sqrtD) / (2 * a);
   const t2 = (-b + sqrtD) / (2 * a);
   const ts = [t1, t2].filter(t => t >= 0);
 
-  if (ts.length === 0) {
-    return false; // Czas spotkania byłby w przeszłości
-  }
+  if (ts.length === 0) return false;
 
   const t = Math.min(...ts);
   const Px = Tx + vx * t;
@@ -267,12 +430,10 @@ function drawMap() {
   const width = canvas.width;
   const height = canvas.height;
   
-  // Czyszczenie i tło mapy
   ctx.clearRect(0, 0, width, height);
   ctx.fillStyle = '#0a0a0a';
   ctx.fillRect(0, 0, width, height);
   
-  // Linie siatki co 500 jednostek
   ctx.strokeStyle = '#333333';
   ctx.lineWidth = 0.5;
   
@@ -292,21 +453,18 @@ function drawMap() {
     ctx.stroke();
   }
   
-  // Pobranie współrzędnych z pól
   const sx = +document.getElementById("sx").value || 0;
   const sy = +document.getElementById("sy").value || 0;
   const tx = +document.getElementById("tx").value || 0;
   const ty = +document.getElementById("ty").value || 0;
   const markerText = document.getElementById("marker").textContent;
   
-  // Konwersja współrzędnych gry na piksele
   function gameToPixel(x, y) {
     const px = (x / 3000) * width;
     const py = (y / 2000) * height;
     return { x: px, y: py };
   }
   
-  // Rysowanie pozycji własnej
   if (sx > 0 || sy > 0) {
     const ourPos = gameToPixel(sx, sy);
     ctx.fillStyle = '#00ff00';
@@ -315,7 +473,6 @@ function drawMap() {
     ctx.fill();
   }
   
-  // Rysowanie celu
   if (tx > 0 || ty > 0) {
     const targetPos = gameToPixel(tx, ty);
     ctx.fillStyle = '#ff0000';
@@ -324,7 +481,6 @@ function drawMap() {
     ctx.fill();
   }
   
-   // Rysowanie markera (punkt przewidywanego trafienia)
   let markerOutOfBounds = false;
   if (markerText !== "---, --- km") {
     const parts = markerText.split(",");
@@ -346,19 +502,24 @@ function drawMap() {
     }
   }
   
-  // Ostrzeżenie jeśli marker poza mapą
   const mainHeader = document.getElementById('mainHeader');
   const mapWarning = document.getElementById('mapWarning');
   
   if (markerOutOfBounds) {
     mapContainer.classList.add('warning');
     mainHeader.classList.add('warning');
-    mainHeader.querySelector('h1').innerHTML = 'IMPACT OUT<br>OF MAP';
+    
+    // Tłumaczenie tytułu dla ostrzeżenia
+    const warningTitle = translations.app?.titleFull || "IMPACT OUT OF MAP";
+    mainHeader.querySelector('h1').innerHTML = warningTitle.split(" ").join("<br>");
     mapWarning.classList.add('show');
   } else {
     mapContainer.classList.remove('warning');
     mainHeader.classList.remove('warning');
-    mainHeader.querySelector('h1').innerHTML = 'HF-INTERCEPT<br>COMPUTER';
+    
+    // Normalny tytuł
+    const normalTitle = translations.app?.title || "HF-INTERCEPT COMP";
+    mainHeader.querySelector('h1').innerHTML = normalTitle;
     mapWarning.classList.remove('show');
   }
 }
@@ -376,7 +537,6 @@ document.getElementById('coordMap').addEventListener('mousemove', function(event
   let gameX = Math.round((x / rect.width) * 3000);
   let gameY = Math.round((y / rect.height) * 2000);
   
-  // Ogranicz do zakresu mapy
   if (gameX < 0) gameX = 0;
   if (gameX > 3000) gameX = 3000;
   if (gameY < 0) gameY = 0;
@@ -389,12 +549,41 @@ document.getElementById('coordMap').addEventListener('mousemove', function(event
   
   mapMouseMoveTimer = setTimeout(() => {
     const coordsElement = document.getElementById('arrowCoords');
+    const mouseX = event.clientX; // Pozycja w całym oknie
+    const mouseY = event.clientY;
+    
+    // Pozycja myszki WZGLĘDEM MAPY
+    const mouseInMapX = event.clientX - rect.left;
+    const mouseInMapY = event.clientY - rect.top;
+    const mapWidth = rect.width;
+    const mapHeight = rect.height;
+    
+    // USTAWIENIE POZIOME - względem mapy
+    let leftPosition;
+    if (mouseInMapX > mapWidth - 61) {
+      // Blisko prawej krawędzi MAPY - pokaż po LEWEJ stronie myszki
+      leftPosition = (mouseX - 60) + 'px';
+    } else {
+      // Normalnie - pokaż po PRAWEJ stronie myszki
+      leftPosition = (mouseX + 10) + 'px';
+    }
+    
+    // USTAWIENIE PIONOWE
+    let topPosition;
+    if (mouseY + 68 > window.innerHeight) {
+      // Blisko dolnej krawędzi OKNA - pokaż NAD myszką
+      topPosition = (mouseY - 45) + 'px';
+    } else {
+      // Normalnie - pokaż POD myszką
+      topPosition = (mouseY + 5) + 'px';
+    }
+    
     coordsElement.innerHTML = `
       <div class="coord-line">X: ${gameX}</div>
       <div class="coord-line">Y: ${gameY}</div>
     `;
-    coordsElement.style.left = (event.clientX + 10) + 'px';
-    coordsElement.style.top = (event.clientY + 10) + 'px';
+    coordsElement.style.left = leftPosition;
+    coordsElement.style.top = topPosition;
     coordsElement.style.display = 'block';
   }, 10);
 });
@@ -405,7 +594,6 @@ document.getElementById('coordMap').addEventListener('mouseleave', function() {
 });
 
 // ========== CUSTOM MISSILE MENU HANDLING ==========
-// ========== MISSILE HOVER COMPATIBILITY CHECK ==========
 function checkMissileCompatibilityOnHover(missileKey) {
   const Sx = +document.getElementById("sx").value || 0;
   const Sy = +document.getElementById("sy").value || 0;
@@ -414,79 +602,64 @@ function checkMissileCompatibilityOnHover(missileKey) {
   const vT = +document.getElementById("vt").value || 0;
   const kursDeg = +document.getElementById("kurs").value || 0;
   
-  if (Sx === 0 && Sy === 0 && Tx === 0 && Ty === 0) {
-    return "neutral";
-  }
+  if (Sx === 0 && Sy === 0 && Tx === 0 && Ty === 0) return "neutral";
   
   const missile = missiles[missileKey];
   if (!missile) return "neutral";
   
   const distance = Math.hypot(Tx - Sx, Ty - Sy);
   
-  // 1. Sprawdź zasięg
-  if (distance > missile.range) {
-    return "incompatible";
-  }
-  
-  // 2. Sprawdź minimalną odległość uzbrojenia
-  if (missile.arming > 0 && distance < missile.arming) {
-    return "incompatible";
-  }
-  
-  // 3. Sprawdź czy rakieta dogoni cel (matematyka przechwytu)
-  if (!canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg)) {
-    return "incompatible";
-  }
+  if (distance > missile.range) return "incompatible";
+  if (missile.arming > 0 && distance < missile.arming) return "incompatible";
+  if (!canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg)) return "incompatible";
   
   return "compatible";
 }
 
 let missileTooltipTimer = null;
-let selectedMissileKey = null;
 
 function selectMissile(key) {
   const missileItems = document.querySelectorAll(".missile-item");
   const rocketSelect = document.getElementById("rakieta");
   
-  missileItems.forEach(item => {
-    item.classList.remove("active");
-  });
-  
-  const selectedItem = document.querySelector(`.missile-item[data-key="${key}"]`);
-  if (selectedItem) {
-    selectedItem.classList.add("active");
+  // Sprawdź czy ta sama rakieta jest już wybrana (toggle)
+  if (selectedMissileKey === key) {
+    // Odznacz - rezygnuj z wyboru
+    const selectedItem = document.querySelector(`.missile-item[data-key="${key}"]`);
+    if (selectedItem) selectedItem.classList.remove("active");
+    
+    rocketSelect.value = "";
+    selectedMissileKey = null;
+  } else {
+    // Zaznacz nową rakietę
+    missileItems.forEach(item => item.classList.remove("active"));
+    
+    const selectedItem = document.querySelector(`.missile-item[data-key="${key}"]`);
+    if (selectedItem) selectedItem.classList.add("active");
+    
+    rocketSelect.value = key;
+    selectedMissileKey = key;
   }
   
-  rocketSelect.value = key;
-  selectedMissileKey = key;
+  // RESET po zmianie rakiety
+  document.querySelector('.key-wide').classList.remove('confirmed'); // COMPUTE OFF
+  updateStatus("status.enterData", "neutral"); // Biały napis
+  
   checkMissileCompatibility();
   saveToLocalStorage();
-  // Usuń podświetlenie przycisku COMPUTE
-  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 // ========== INITIALIZATION ==========
 document.addEventListener("DOMContentLoaded", function() {
+  // USTAWIENIE STANU POCZĄTKOWEGO
+  document.querySelector('.key-wide').classList.remove('confirmed'); // COMPUTE OFF
+  updateStatus("status.enterData", "neutral");
+  selectedMissileKey = null;
+  showMissileHighlights = false;
+  
   const missileItems = document.querySelectorAll(".missile-item");
   
   missileItems.forEach(item => {
-    item.addEventListener("mouseenter", function() {
-      const missileKey = this.dataset.key;
-      const compatibility = checkMissileCompatibilityOnHover(missileKey);
-      
-      this.classList.remove("compatible-border", "incompatible-border");
-      
-      if (compatibility === "compatible") {
-        this.classList.add("compatible-border");
-      } else if (compatibility === "incompatible") {
-        this.classList.add("incompatible-border");
-      }
-    });
-    
-    item.addEventListener("mouseleave", function() {
-      this.classList.remove("compatible-border", "incompatible-border");
-    });
-    
     item.addEventListener("mouseover", function(event) {
       const missileKey = this.dataset.key;
       
@@ -525,28 +698,41 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
   
-  if (missileItems.length > 0) {
-    selectMissile(missileItems[0].dataset.key);
-  }
+  // NIE wybieraj rakiety automatycznie na starcie
+  // if (missileItems.length > 0) selectMissile(missileItems[0].dataset.key);
   
   loadFromLocalStorage();
   
-  setTimeout(() => {
-    drawMap();
-  }, 100);
+  setTimeout(() => { drawMap(); }, 100);
   
-  window.addEventListener('resize', function() {
-    drawMap();
+  window.addEventListener('resize', function() { drawMap(); });
+  
+  // KÓŁKO MYSZY - dodanie event listenera przy inicjalizacji
+  document.querySelectorAll(".input-field").forEach(field => {
+    field.addEventListener("wheel", function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      
+      const fieldId = this.id;
+      const isArrowUp = event.deltaY < 0;
+      const delta = isArrowUp ? 10 : -10;
+      
+      playSound('tick');
+      adjustFieldOnce(fieldId, delta);
+    });
   });
 });
 
-// ========== COORDINATES VALIDATION (0-3000 X, 0-2000 Y) ==========
+// ========== COORDINATES VALIDATION ==========
 function validateCoordinates(input) {
+  playSound('tick');
+  
+  // Zresetuj cały stan aplikacji
+  resetAppState();
+  
   input.value = input.value.replace(/\D/g, '');
   
-  if (input.value.length > 4) {
-    input.value = input.value.slice(0, 4);
-  }
+  if (input.value.length > 4) input.value = input.value.slice(0, 4);
   
   let val = parseInt(input.value) || 0;
   
@@ -563,17 +749,18 @@ function validateCoordinates(input) {
   checkMissileCompatibility();
   saveToLocalStorage();
   drawMap();
-  // Usuń podświetlenie przycisku COMPUTE
-  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
-// ========== DIGIT LIMITATION (for vt and kurs) ==========
+// ========== DIGIT LIMITATION ==========
 function limitDigits(input, maxDigits) {
+  playSound('tick');
+  
+  // Zresetuj cały stan aplikacji
+  resetAppState();
+  
   input.value = input.value.replace(/\D/g, '');
   
-  if (input.value.length > maxDigits) {
-    input.value = input.value.slice(0, maxDigits);
-  }
+  if (input.value.length > maxDigits) input.value = input.value.slice(0, maxDigits);
   
   if (input.id === "kurs") {
     let val = parseInt(input.value) || 0;
@@ -583,12 +770,14 @@ function limitDigits(input, maxDigits) {
   
   checkMissileCompatibility();
   saveToLocalStorage();
-  // Usuń podświetlenie przycisku COMPUTE
-  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 // ========== INPUT FIELD KEY HANDLING ==========
 function handleKeyInput(event, fieldId) {
+  if (event.key === "+" || event.key === "=" || event.key === "-" || event.key === "_") {
+    playSound('tick');
+  }
+  
   if (event.key === "Escape") {
     event.preventDefault();
     if (activeField) {
@@ -614,10 +803,12 @@ function handleKeyInput(event, fieldId) {
   
   if (event.key === "ArrowUp") {
     event.preventDefault();
+    playSound('tick');
     adjustFieldOnce(fieldId, (fieldId === "vt") ? 10 : 1);
   }
   if (event.key === "ArrowDown") {
     event.preventDefault();
+    playSound('tick');
     adjustFieldOnce(fieldId, (fieldId === "vt") ? -10 : -1);
   }
   
@@ -643,11 +834,6 @@ function handleKeyInput(event, fieldId) {
       !(event.key === "v" && event.ctrlKey) &&
       !(event.key === "x" && event.ctrlKey)) {
     event.preventDefault();
-  }
-  
-  // Usuń podświetlenie przycisku COMPUTE po wpisaniu klawisza
-  if (allowedKeys.includes(event.key) && !event.ctrlKey && !event.metaKey) {
-    document.querySelector('.key-wide').classList.remove('confirmed');
   }
 }
 
@@ -675,9 +861,7 @@ document.querySelectorAll(".input-field").forEach(field => {
 const resultTooltipTimers = {};
 
 function showResultTooltip(tooltipId, event) {
-  if (resultTooltipTimers[tooltipId]) {
-    clearTimeout(resultTooltipTimers[tooltipId]);
-  }
+  if (resultTooltipTimers[tooltipId]) clearTimeout(resultTooltipTimers[tooltipId]);
   
   resultTooltipTimers[tooltipId] = setTimeout(() => {
     const tooltip = document.getElementById(tooltipId);
@@ -699,6 +883,11 @@ function hideResultTooltip(tooltipId) {
 let arrowInterval = null;
 
 function startArrow(fieldId, delta) {
+  playSound('click');
+  
+  // Zresetuj cały stan aplikacji
+  resetAppState();
+  
   const field = document.getElementById(fieldId);
   updateArrowCoordinates(fieldId, parseInt(field.value) || 0);
   adjustFieldOnce(fieldId, delta);
@@ -709,6 +898,8 @@ function startArrow(fieldId, delta) {
 }
 
 function adjustFieldOnce(fieldId, delta) {
+  playSound('tick');
+  
   const field = document.getElementById(fieldId);
   if (!field) return;
   
@@ -744,8 +935,6 @@ function adjustFieldOnce(fieldId, delta) {
   if (fieldId === "sx" || fieldId === "sy" || fieldId === "tx" || fieldId === "ty") {
     drawMap();
   }
-  // Usuń podświetlenie przycisku COMPUTE
-  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
 function stopArrow() {
@@ -759,6 +948,11 @@ function stopArrow() {
 
 // ========== NUMERIC KEYBOARD FUNCTIONS ==========
 function press(val) {
+  playSound('click');
+  
+  // Zresetuj cały stan aplikacji
+  resetAppState();
+  
   if (!activeField) return;
   activeField.value += val;
   
@@ -773,61 +967,60 @@ function press(val) {
   
   checkMissileCompatibility();
   saveToLocalStorage();
-  // Usuń podświetlenie przycisku COMPUTE
-  document.querySelector('.key-wide').classList.remove('confirmed');
 }
 
-// ========== CLEAR FIELD (clears only active field) ==========
+// ========== CLEAR FIELD ==========
 function clearField() {
-  if (!activeField) return;
-  activeField.value = "";
-  checkMissileCompatibility();
-  saveToLocalStorage();
-  drawMap();
-  // Usuń podświetlenie przycisku COMPUTE
-  document.querySelector('.key-wide').classList.remove('confirmed');
+  // Jeśli nie ma aktywnego pola - błąd
+  if (!activeField) {
+    setTimeout(() => {
+      playSound('error');
+    }, 300);
+    return;
+  }
+  
+  // Odtwórz dźwięk clear po 0.3s
+  setTimeout(() => {
+    playSound('clear');
+    activeField.value = "";
+    
+    // Zresetuj cały stan aplikacji
+    resetAppState();
+    
+    checkMissileCompatibility();
+    saveToLocalStorage();
+    drawMap();
+  }, 300);
 }
 
-// ========== CLEAR ALL FIELDS (clears all fields) ==========
+// ========== CLEAR ALL FIELDS ==========
 function clearAllFields() {
-  const fields = ["sx", "sy", "tx", "ty", "vt", "kurs"];
-  fields.forEach(id => {
-    const field = document.getElementById(id);
-    if (field) {
-      field.value = "";
+  // Odtwórz dźwięk clear po 0.3s
+  setTimeout(() => {
+    playSound('clear');
+    
+    const fields = ["sx", "sy", "tx", "ty", "vt", "kurs"];
+    fields.forEach(id => {
+      const field = document.getElementById(id);
+      if (field) field.value = "";
+    });
+    
+    if (activeField) {
+      activeField.classList.remove("active");
+      activeField = null;
     }
-  });
-  
-  if (activeField) {
-    activeField.classList.remove("active");
-    activeField = null;
-  }
-  
-  // Usuń podświetlenie aktywnej rakiety
-  const activeMissile = document.querySelector(".missile-item.active");
-  if (activeMissile) {
-    activeMissile.classList.remove("active");
-  }
-  selectedMissileKey = null;
-  
-  // Usuń wszystkie podświetlenia zgodności
-  document.querySelectorAll(".missile-item").forEach(item => {
-    item.classList.remove("highlight-compatible");
-    item.classList.remove("compatible-border");
-    item.classList.remove("incompatible-border");
-  });
-  
-  document.getElementById("marker").textContent = "---, --- km";
-  document.getElementById("distance").textContent = "--- km";
-  document.getElementById("bearing").textContent = "---°";
-  document.getElementById("timeToImpact").textContent = "00:00:00";
-  
-  // Usuń podświetlenie przycisku COMPUTE
-  document.querySelector('.key-wide').classList.remove('confirmed');
-  
-  updateStatus("WPISZ DANE CELU", "neutral");
-  saveToLocalStorage();
-  drawMap();
+    
+    // Zresetuj cały stan aplikacji
+    resetAppState();
+    
+    document.getElementById("marker").textContent = "---, --- km";
+    document.getElementById("distance").textContent = "--- km";
+    document.getElementById("bearing").textContent = "---°";
+    document.getElementById("timeToImpact").textContent = "00:00:00";
+    
+    saveToLocalStorage();
+    drawMap();
+  }, 300);
 }
 
 // ========== LOCALSTORAGE ==========
@@ -887,45 +1080,74 @@ function checkMissileCompatibility() {
   const vT = +document.getElementById("vt").value || 0;
   const kursDeg = +document.getElementById("kurs").value || 0;
   
-  const missileKey = document.getElementById("rakieta").value;
-  if (!missiles[missileKey]) {
-    updateStatus("WYBIERZ RAKIETĘ", "warning");
-    return;
-  }
+  const missileKey = selectedMissileKey || document.getElementById("rakieta").value;
   
-  const missile = missiles[missileKey];
+  // Sprawdź czy wszystkie 6 pól są wypełnione
+  const allFilled = Sx !== 0 && Sy !== 0 && Tx !== 0 && Ty !== 0 && vT !== 0 && kursDeg !== 0;
   
-  const allFilled = Sx !== 0 || Sy !== 0 || Tx !== 0 || Ty !== 0 || vT !== 0;
   if (!allFilled) {
-    updateStatus("WPISZ DANE CELU", "neutral");
+    // Jeśli nie wszystkie pola wypełnione - biały napis
+    updateStatus("status.enterData", "neutral");
     return;
   }
   
+  // Jeśli wszystkie pola wypełnione ale brak rakiety - biały napis
+  if (!missileKey || !missiles[missileKey]) {
+    updateStatus("status.enterData", "neutral");
+    return;
+  }
+  
+  // Tutaj tylko sprawdzamy ale NIE pokazujemy statusów kolorowych
+  // Statusy kolorowe pokazują się tylko po kliknięciu COMPUTE z rakietą
+  const missile = missiles[missileKey];
   const distance = Math.hypot(Tx - Sx, Ty - Sy);
   
   if (distance > missile.range) {
-    updateStatus(`CEL POZA ZASIĘGIEM`, "error");
-    return;
+    return; // Nie pokazuj statusu - pokaże się po COMPUTE
   }
   
   if (missile.arming > 0 && distance < missile.arming) {
-    updateStatus(`CEL ZA BLISKO DO UZBROJENIA`, "error");
-    return;
+    return; // Nie pokazuj statusu - pokaże się po COMPUTE
   }
   
-  // DODANE: Sprawdzenie czy rakieta dogoni cel
   if (!canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg)) {
-    updateStatus("CEL NIEOSIĄGALNY KINETYCZNIE", "error");
-    return;
+    return; // Nie pokazuj statusu - pokaże się po COMPUTE
   }
   
-  updateStatus(`${missile.name.split(" ")[0]} ${missile.range}km|${missile.speed}km/h`, "success");
+  // Wszystko OK ale też nie pokazuj - pokaże się po COMPUTE
 }
 
 // ========== STATUS UPDATE ==========
-function updateStatus(message, type) {
+function updateStatus(translationKey, type) {
   const statusText = document.getElementById("statusText");
   const statusIcon = document.getElementById("statusIcon");
+  
+  // Pobierz przetłumaczony tekst
+  let message;
+  if (translationKey.startsWith("status.")) {
+    const keys = translationKey.split('.');
+    let value = translations;
+    for (const key of keys) {
+      if (value && value[key]) {
+        value = value[key];
+      } else {
+        value = null;
+        break;
+      }
+    }
+    message = value || translationKey;
+  } else {
+    message = translationKey;
+  }
+  
+  // Dodaj nazwę rakiety dla statusu "APPROVED"
+  if (translationKey === "status.approved" && selectedMissileKey) {
+    const missile = missiles[selectedMissileKey];
+    if (missile) {
+      const missileShortName = missile.name.split(" ")[0];
+      message = `${missileShortName} ${message}`;
+    }
+  }
   
   statusText.textContent = message;
   statusText.classList.remove("status-valid");
@@ -973,7 +1195,7 @@ function highlightCompatibleMissiles() {
                         canIntercept(missile, Sx, Sy, Tx, Ty, vT, kursDeg);
     
     item.classList.remove("highlight-compatible");
-    if (isCompatible) {
+    if (isCompatible && showMissileHighlights) {
       item.classList.add("highlight-compatible");
     }
   });
@@ -981,6 +1203,8 @@ function highlightCompatibleMissiles() {
 
 // ========== MAIN CALCULATIONS ==========
 function calculateTarget() {
+  playSound('click'); // Natychmiastowy dźwięk click
+  
   const Sx = +document.getElementById("sx").value || 0;
   const Sy = +document.getElementById("sy").value || 0;
   const Tx = +document.getElementById("tx").value || 0;
@@ -988,15 +1212,48 @@ function calculateTarget() {
   const vT = +document.getElementById("vt").value || 0;
   const kursDeg = +document.getElementById("kurs").value || 0;
 
-  const missileKey = document.getElementById("rakieta").value;
-  if (!missiles[missileKey]) {
-    updateStatus("WYBIERZ RAKIETĘ", "error");
+  // Sprawdź czy wszystkie 6 pól są wypełnione
+  const allFilled = Sx !== 0 && Sy !== 0 && Tx !== 0 && Ty !== 0 && vT !== 0 && kursDeg !== 0;
+  
+  if (!allFilled) {
+    // Jeśli nie wszystkie pola wypełnione - ERROR po 0.3s
+    setTimeout(() => {
+      playSound('error');
+    }, 300);
+    document.querySelector('.key-wide').classList.remove('confirmed'); // COMPUTE OFF
     return;
   }
-
+  
+  const missileKey = selectedMissileKey || document.getElementById("rakieta").value;
+  
+  // SCENARIUSZ 1: Wszystkie pola wypełnione, ale brak wybranej rakiety
+  if (!missileKey || !missiles[missileKey]) {
+    // Pokazuj zielone rakiety, COMPUTE miga i gaśnie
+    showMissileHighlights = true;
+    highlightCompatibleMissiles();
+    
+    // AKTYWUJ menu rakiet
+    const missileMenu = document.getElementById('missileMenu');
+    if (missileMenu) {
+      missileMenu.classList.remove('disabled');
+      missileMenu.classList.add('enabled');
+    }
+    
+    // COMPUTE: ON → OFF (miga na chwilę)
+    document.querySelector('.key-wide').classList.add('confirmed');
+    setTimeout(() => {
+      document.querySelector('.key-wide').classList.remove('confirmed');
+    }, 300);
+    
+    // Napis pozostaje biały "ENTER TARGET DATA"
+    updateStatus("status.enterData", "neutral");
+    return;
+  }
+  
+  // SCENARIUSZ 2: Wszystkie pola wypełnione + rakieta wybrana
   const missile = missiles[missileKey];
-
-  // Jeśli prędkość celu = 0, punkt trafienia = pozycja celu
+  
+  // Obliczenia
   if (vT === 0) {
     const markerX = Tx;
     const markerY = Ty;
@@ -1011,7 +1268,6 @@ function calculateTarget() {
     document.getElementById("distance").textContent = `${distToImpact.toFixed(0)} km`;
     document.getElementById("bearing").textContent = `${bearingDeg.toFixed(0)}°`;
 
-    // Oblicz czas w formacie HH:MM:SS
     const timeSeconds = distToImpact / missile.speed * 3600;
     const hours = Math.floor(timeSeconds / 3600);
     const minutes = Math.floor((timeSeconds % 3600) / 60);
@@ -1019,14 +1275,32 @@ function calculateTarget() {
     document.getElementById("timeToImpact").textContent = 
       `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-    updateStatus(`${missile.name.split(" ")[0]} PARAMETRY WPROWADZONE`, "success");
+    // Sprawdź czy rakieta pasuje
+    const distance = Math.hypot(Tx - Sx, Ty - Sy);
+    
+    setTimeout(() => {
+      if (distance > missile.range) {
+        updateStatus("status.outOfRange", "error");
+        playSound('error');
+        document.querySelector('.key-wide').classList.remove('confirmed'); // COMPUTE OFF
+      } else if (missile.arming > 0 && distance < missile.arming) {
+        updateStatus("status.tooClose", "error");
+        playSound('error');
+        document.querySelector('.key-wide').classList.remove('confirmed'); // COMPUTE OFF
+      } else {
+        updateStatus("status.approved", "success");
+        playSound('success');
+        // COMPUTE pozostaje ON
+        document.querySelector('.key-wide').classList.add('confirmed');
+      }
+    }, 300);
+    
     saveToLocalStorage();
     drawMap();
-    // Podświetl przycisk COMPUTE
-    document.querySelector('.key-wide').classList.add('confirmed');
     return;
   }
 
+  // Obliczenia dla vT > 0
   const kursRad = kursDeg * Math.PI / 180;
   const vx = vT * Math.sin(kursRad);
   const vy = -vT * Math.cos(kursRad);
@@ -1040,7 +1314,11 @@ function calculateTarget() {
 
   const d = b * b - 4 * a * c;
   if (d < 0) {
-    updateStatus("CEL NIEOSIĄGALNY KINETYCZNIE", "error");
+    setTimeout(() => {
+      updateStatus("status.kinematic", "error");
+      playSound('error');
+      document.querySelector('.key-wide').classList.remove('confirmed'); // COMPUTE OFF
+    }, 300);
     document.getElementById("timeToImpact").textContent = "00:00:00";
     return;
   }
@@ -1051,7 +1329,11 @@ function calculateTarget() {
   const ts = [t1, t2].filter(t => t >= 0);
 
   if (ts.length === 0) {
-    updateStatus("CEL NIEOSIĄGALNY KINETYCZNIE", "error");
+    setTimeout(() => {
+      updateStatus("status.kinematic", "error");
+      playSound('error');
+      document.querySelector('.key-wide').classList.remove('confirmed'); // COMPUTE OFF
+    }, 300);
     document.getElementById("timeToImpact").textContent = "00:00:00";
     return;
   }
@@ -1063,7 +1345,11 @@ function calculateTarget() {
 
   const distToImpact = Math.hypot(Px - Sx, Py - Sy);
   if (distToImpact > missile.range) {
-    updateStatus(`CEL POZA ZASIĘGIEM`, "error");
+    setTimeout(() => {
+      updateStatus("status.outOfRange", "error");
+      playSound('error');
+      document.querySelector('.key-wide').classList.remove('confirmed'); // COMPUTE OFF
+    }, 300);
     document.getElementById("timeToImpact").textContent = "00:00:00";
     return;
   }
@@ -1083,7 +1369,6 @@ function calculateTarget() {
   document.getElementById("distance").textContent = `${markerDist.toFixed(0)} km`;
   document.getElementById("bearing").textContent = `${bearingDeg.toFixed(0)}°`;
 
-  // Oblicz czas w formacie HH:MM:SS
   const timeSeconds = t * 3600;
   const hours = Math.floor(timeSeconds / 3600);
   const minutes = Math.floor((timeSeconds % 3600) / 60);
@@ -1091,20 +1376,15 @@ function calculateTarget() {
   document.getElementById("timeToImpact").textContent = 
     `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
-  // Sprawdź zapas 15km po uzbrojeniu (cichy warunek)
-  if (missile.arming > 0) {
-    const distAfterArming = Math.max(0, markerDist - missile.arming);
-    if (distAfterArming < 15) {
-      // Cichy warunek, nie wyświetla komunikatu
-    }
-  }
+  setTimeout(() => {
+    updateStatus("status.approved", "success");
+    playSound('success');
+    // COMPUTE pozostaje ON
+    document.querySelector('.key-wide').classList.add('confirmed');
+  }, 300);
 
-  updateStatus(`${missile.name.split(" ")[0]} PARAMETRY WPROWADZONE`, "success");
   saveToLocalStorage();
   drawMap();
-  highlightCompatibleMissiles();
-  // Podświetl przycisk COMPUTE
-  document.querySelector('.key-wide').classList.add('confirmed');
 }
 
 // Obsługa kółka myszy dla pól wprowadzania
@@ -1117,6 +1397,7 @@ document.querySelectorAll(".input-field").forEach(field => {
     const isArrowUp = event.deltaY < 0;
     const delta = isArrowUp ? 10 : -10;
     
+    playSound('tick');
     adjustFieldOnce(fieldId, delta);
   });
 });
@@ -1141,6 +1422,19 @@ function updateArrowCoordinates(fieldId, currentValue) {
 function hideArrowCoordinates() {
   document.getElementById('arrowCoords').style.display = 'none';
 }
+
+// ========== POMIAR WYMIARÓW ==========
+function pokazWymiary() {
+  const app = document.querySelector('.app-container');
+  if (app) {
+    document.getElementById('szerokosc').textContent = app.offsetWidth;
+    document.getElementById('wysokosc').textContent = app.offsetHeight;
+  }
+}
+
+window.addEventListener('load', pokazWymiary);
+window.addEventListener('resize', pokazWymiary);
+setTimeout(pokazWymiary, 1000);
 
 // ========== ARROW BUTTON HOVER EFFECTS ==========
 document.querySelectorAll('.arrow-btn').forEach(btn => {

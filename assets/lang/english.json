@@ -1,0 +1,164 @@
+{
+  "app": {
+    "title": "HF-INTERCEPT COMP",
+    "titleFull": "HF-INTERCEPT COMPUTER"
+  },
+  
+  "headerLinks": {
+    "buyCoffee": "BUY ME A COFFEE",
+    "languageSwitch": "ENPL",
+    "coffeeCup": "COFFIE"
+  },
+  
+  "inputFields": {
+    "our": "OUR",
+    "target": "TAR.",
+    "speed": "SPEED",
+    "bearing": "BEARING",
+    "x": "X",
+    "y": "Y"
+  },
+  
+  "missileMenu": {
+    "kh15": "Kh-15 (Cruise Missile)",
+    "kh22": "Kh-22 (Cruise Missile)",
+    "a100": "A-100 (Tactical Missile)",
+    "r9": "R-9 Sprint (AA Defence)",
+    "r3": "R-3 (Ballistic Missile)",
+    "r5": "R-5 Zenith (Air-to-Air)",
+    "k13": "K-13 AAM (Air-to-Air)",
+    "s13": "S-13 NURS (Unguided)",
+    "fab": "FAB Bombs"
+  },
+  
+  "missileDetails": {
+    "kh15": {
+      "name": "Kh-15",
+      "stats": "1600km|900km/h",
+      "purpose": "ground/naval"
+    },
+    "kh15N": {
+      "name": "Kh-15N",
+      "stats": "1600km|900km/h",
+      "purpose": "Strategic weapon"
+    },
+    "kh15P": {
+      "name": "Kh-15P",
+      "stats": "1600km|900km/h",
+      "purpose": "Anti-radiation"
+    },
+    "kh22": {
+      "name": "Kh-22",
+      "stats": "2500km|1200km/h",
+      "purpose": "strategic/fleet"
+    },
+    "kh22N": {
+      "name": "Kh-22N",
+      "stats": "2500km|1200km/h",
+      "purpose": "Strategic weapon"
+    },
+    "a100": {
+      "name": "A-100",
+      "stats": "400km|4000km/h",
+      "purpose": "Anti-aircraft"
+    },
+    "a100N": {
+      "name": "A-100N",
+      "stats": "400km|4000km/h",
+      "purpose": "Nuclear strikes"
+    },
+    "r9": {
+      "name": "R-9",
+      "stats": "200km|5000km/h",
+      "purpose": "Point defense"
+    },
+    "r3": {
+      "name": "R-3",
+      "stats": "2000km|8280km/h",
+      "purpose": "Ballistic attacks"
+    },
+    "r3N": {
+      "name": "R-3N",
+      "stats": "2000km|8280km/h",
+      "purpose": "Strategic strikes"
+    },
+    "r5": {
+      "name": "R-5",
+      "stats": "30km|2000km/h",
+      "purpose": "WVR air combat"
+    },
+    "k13": {
+      "name": "K-13",
+      "stats": "30km|2000km/h",
+      "purpose": "Air combat"
+    },
+    "s13": {
+      "name": "S-13",
+      "stats": "20km|1500km/h",
+      "purpose": "Ground attacks"
+    },
+    "fab100": {
+      "name": "FAB-100",
+      "stats": "5km|free fall",
+      "purpose": "Bombing raids"
+    },
+    "fab250": {
+      "name": "FAB-250",
+      "stats": "5km|free fall",
+      "purpose": "Bombing raids"
+    }
+  },
+  
+  "targetingPanel": {
+    "markerCoords": "MARKER COORDS:",
+    "distance": "DISTANCE:",
+    "bearing": "BEARING:",
+    "timeToImpact": "TIME TO IMPACT:",
+    "enterTargetData": "ENTER TARGET DATA",
+    "computeFiringSolution": "COMPUTE FIRING SOLUTION"
+  },
+  
+  "keyboard": {
+    "clear": "CLEAR",
+    "clearAll": "CLEAR ALL"
+  },
+  
+  "map": {
+    "interceptMap": "INTERCEPT MAP",
+    "ourPosition": "OUR POSITION",
+    "target": "TARGET",
+    "interceptPoint": "INTERCEPT POINT",
+    "coordinates": "COORDINATES",
+    "warning": "WARNING: IMPACT OUT OF MAP BOUNDS"
+  },
+  
+  "tooltips": {
+    "markerCoords": "Coordinates of the point to aim the missile at.<br>The missile will fly to this location and begin searching for the target after arming.",
+    "distance": "Distance from your position to the aiming point.<br>Must be less than the missile's maximum range.",
+    "bearing": "Direction in degrees (0-360°) to fire the missile.<br>0° = north, 90° = east, 180° = south, 270° = west.",
+    "timeToImpact": "Time in hours:minutes:seconds until the missile hits the target.<br>Calculated for guided missiles."
+  },
+  
+  "missileTooltips": {
+    "guidance": "Guidance:",
+    "fuse": "Fuse:",
+    "warhead": "Warhead:",
+    "speed": "Speed:",
+    "arming": "Arming:",
+    "context": "Context:"
+  },
+  
+  "status": {
+    "enterData": "ENTER TARGET DATA",
+    "outOfRange": "TARGET OUT OF RANGE",
+    "tooClose": "TARGET TOO CLOSE TO ARMING",
+    "kinematic": "TARGET KINEMATICALLY UNREACHABLE",
+    "approved": "APPROVED"
+  },
+  
+  "dimensions": {
+    "label": "Dimensions:",
+    "width": "width",
+    "height": "height"
+  }
+}

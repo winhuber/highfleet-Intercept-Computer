@@ -1,0 +1,164 @@
+HF-App 15.12.2025-1215{
+  "app": {
+    "title": "HF-INTERCEPT COMP",
+    "titleFull": "KOMPUTER PRZECHWYTU HF"
+  },
+  
+  "headerLinks": {
+    "buyCoffee": "KUP MI KAWĘ",
+    "languageSwitch": "ENPL",
+    "coffeeCup": "KAWA"
+  },
+  
+  "inputFields": {
+    "our": "NASZ",
+    "target": "CEL",
+    "speed": "PRĘDKOŚĆ",
+    "bearing": "KURS",
+    "x": "X",
+    "y": "Y"
+  },
+  
+  "missileMenu": {
+    "kh15": "Kh-15 (Pocisk Manewrujący)",
+    "kh22": "Kh-22 (Pocisk Manewrujący)",
+    "a100": "A-100 (Pocisk Taktyczny)",
+    "r9": "R-9 Sprint (Obrona PP)",
+    "r3": "R-3 (Pocisk Balistyczny)",
+    "r5": "R-5 Zenith (Powietrze-Powietrze)",
+    "k13": "K-13 AAM (Powietrze-Powietrze)",
+    "s13": "S-13 NURS (Niekierowany)",
+    "fab": "Bomby FAB"
+  },
+  
+  "missileDetails": {
+    "kh15": {
+      "name": "Kh-15",
+      "stats": "1600km|900km/h",
+      "purpose": "naziemne/morskie"
+    },
+    "kh15N": {
+      "name": "Kh-15N",
+      "stats": "1600km|900km/h",
+      "purpose": "Broń strategiczna"
+    },
+    "kh15P": {
+      "name": "Kh-15P",
+      "stats": "1600km|900km/h",
+      "purpose": "Przeciwradarowa"
+    },
+    "kh22": {
+      "name": "Kh-22",
+      "stats": "2500km|1200km/h",
+      "purpose": "strategiczne/flota"
+    },
+    "kh22N": {
+      "name": "Kh-22N",
+      "stats": "2500km|1200km/h",
+      "purpose": "Broń strategiczna"
+    },
+    "a100": {
+      "name": "A-100",
+      "stats": "400km|4000km/h",
+      "purpose": "Przeciwlotnicze"
+    },
+    "a100N": {
+      "name": "A-100N",
+      "stats": "400km|4000km/h",
+      "purpose": "Uderzenia nuklearne"
+    },
+    "r9": {
+      "name": "R-9",
+      "stats": "200km|5000km/h",
+      "purpose": "Obrona punktowa"
+    },
+    "r3": {
+      "name": "R-3",
+      "stats": "2000km|8280km/h",
+      "purpose": "Ataki balistyczne"
+    },
+    "r3N": {
+      "name": "R-3N",
+      "stats": "2000km|8280km/h",
+      "purpose": "Uderzenia strategiczne"
+    },
+    "r5": {
+      "name": "R-5",
+      "stats": "30km|2000km/h",
+      "purpose": "Walka powietrzna WVR"
+    },
+    "k13": {
+      "name": "K-13",
+      "stats": "30km|2000km/h",
+      "purpose": "Walka powietrzna"
+    },
+    "s13": {
+      "name": "S-13",
+      "stats": "20km|1500km/h",
+      "purpose": "Ataki naziemne"
+    },
+    "fab100": {
+      "name": "FAB-100",
+      "stats": "5km|sw. spadek",
+      "purpose": "Naloty bombowe"
+    },
+    "fab250": {
+      "name": "FAB-250",
+      "stats": "5km|sw. spadek",
+      "purpose": "Naloty bombowe"
+    }
+  },
+  
+  "targetingPanel": {
+    "markerCoords": "POŁOŻENIE CELU:",
+    "distance": "ODLEGŁOŚĆ:",
+    "bearing": "KURS:",
+    "timeToImpact": "CZAS DO TRAFIENIA:",
+    "enterTargetData": "WPISZ DANE CELU",
+    "computeFiringSolution": "OBLICZ PARAMETRY"
+  },
+  
+  "keyboard": {
+    "clear": "CLEAR",
+    "clearAll": "CLEAR ALL"
+  },
+  
+  "map": {
+    "interceptMap": "MAPA PRZECHWYTU",
+    "ourPosition": "NASZA POZYCJA",
+    "target": "CEL",
+    "interceptPoint": "PUNKT PRZECHWYCENIA",
+    "coordinates": "WSPÓŁRZĘDNE",
+    "warning": "OSTRZEŻENIE: PUNKT UDERZENIA POZA MAPĄ"
+  },
+  
+  "tooltips": {
+    "markerCoords": "Współrzędne punktu, w który należy wycelować rakietę.<br>Rakieta poleci w to miejsce i po uzbrojeniu zacznie szukać celu.",
+    "distance": "Odległość od twojej pozycji do punktu celowania.<br>Musi być mniejsza niż maksymalny zasięg rakiety.",
+    "bearing": "Kierunek w stopniach (0-360°), w którym należy wystrzelić rakietę.<br>0° = północ, 90° = wschód, 180° = południe, 270° = zachód.",
+    "timeToImpact": "Czas w formacie godziny:minuty:sekundy, po którym rakieta uderzy w cel.<br>Obliczany dla rakiet z naprowadzaniem."
+  },
+  
+  "missileTooltips": {
+    "guidance": "Naprowadzanie:",
+    "fuse": "Zapalnik:",
+    "warhead": "Głowica:",
+    "speed": "Prędkość:",
+    "arming": "Uzbrojenie:",
+    "context": "Kontekst:"
+  },
+  
+  "status": {
+    "enterData": "WPISZ DANE CELU",
+    "outOfRange": "CEL POZA ZASIĘGIEM",
+    "tooClose": "CEL ZA BLISKO DO UZBROJENIA",
+    "kinematic": "CEL NIEOSIĄGALNY KINETYCZNIE",
+    "approved": "ZATWIERDZONO"
+  },
+  
+  "dimensions": {
+    "label": "Wymiary:",
+    "width": "szerokość",
+    "height": "wysokość"
+  }
+}
